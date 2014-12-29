@@ -18,14 +18,15 @@
 #include <wchar.h>
 
 #if defined(__STL_USE_NEW_IOSTREAMS) && !defined(__SGI_STL_IOSFWD)
-#include <iosfwd>
+#include <iosfwd>//输入输出流的头文件
 #endif /* use new iostreams */
 
 __STL_BEGIN_NAMESPACE
 
 // Class __char_traits_base.
 
-template <class _CharT, class _IntT> struct __char_traits_base {
+template <class _CharT, class _IntT> 
+struct __char_traits_base {
   typedef _CharT char_type;
   typedef _IntT int_type;
 #ifdef __STL_USE_NEW_IOSTREAMS

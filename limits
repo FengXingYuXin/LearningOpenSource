@@ -1,3 +1,4 @@
+//对于特定具体的类型,使用泛型特化的方法求解其数值极限
 /*
  * Copyright (c) 1997
  * Silicon Graphics Computer Systems, Inc.
@@ -55,7 +56,7 @@ enum float_denorm_style {
 // take their addresses.  We choose the former workaround.
 
 #ifdef __STL_STATIC_CONST_INIT_BUG
-# define __STL_DECLARE_LIMITS_MEMBER(__mem_type, __mem_name, __mem_value) \
+# define __STL_DECLARE_LIMITS_MEMBER(__mem_type, __mem_name, __mem_value) \//反斜杠符号"\"起到强制换行的作用
   enum { __mem_name = __mem_value }
 #else /* __STL_STATIC_CONST_INIT_BUG */
 # define __STL_DECLARE_LIMITS_MEMBER(__mem_type, __mem_name, __mem_value) \

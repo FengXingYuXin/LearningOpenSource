@@ -1,3 +1,4 @@
+//资源管理类的典型实现--针对指针的管理进行简要的封装与处理
 /*
  * Copyright (c) 1997-1999
  * Silicon Graphics Computer Systems, Inc.

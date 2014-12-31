@@ -23,6 +23,7 @@
 
 __STL_BEGIN_NAMESPACE
 
+//异常基类为项目开发中异常处理提供了基础条件，使得具体情形中的异常在继承框架中很好地得到处理
 class __Named_exception : public __STL_EXCEPTION_BASE {
 public:
   __Named_exception(const string& __str) {
@@ -32,7 +33,7 @@ public:
   virtual const char* what() const __STL_NOTHROW { return _M_name; }
 
 private:
-  enum { _S_bufsize = 256 };
+  enum { _S_bufsize = 256 };//enum hack
   char _M_name[_S_bufsize];
 };
 

@@ -1,3 +1,8 @@
+//空间管理策略的设计原则及哲学：
+//1 向system heap要求空间--内存池技术；
+//2 考虑多线程状态--针对性处理以及锁机制；
+//3 考虑内存不足时的应变策略--不断尝试释放，配置，再释放，再配置 ...;
+//4 考虑内存碎片问题的解决方案--双层级配置器。
 /*
  * Copyright (c) 1996
  * Silicon Graphics Computer Systems, Inc.
@@ -40,8 +45,9 @@
 
 __STL_BEGIN_NAMESPACE
 
-#define __STL_DATA_ALIGNMENT 8
+#define __STL_DATA_ALIGNMENT 8  //小型区块的上调边界
 
+//使用共用体--使得不会在维护链表的情况下造成内存的另一种浪费
 union _Pthread_alloc_obj {
     union _Pthread_alloc_obj * __free_list_link;
     char __client_data[__STL_DATA_ALIGNMENT];    /* The client sees this.    */
@@ -55,7 +61,7 @@ union _Pthread_alloc_obj {
 template<size_t _Max_size>
 struct _Pthread_alloc_per_thread_state {
   typedef _Pthread_alloc_obj __obj;
-  enum { _S_NFREELISTS = _Max_size/__STL_DATA_ALIGNMENT };
+  enum { _S_NFREELISTS = _Max_size/__STL_DATA_ALIGNMENT };//free-lists个数
   _Pthread_alloc_obj* volatile __free_list[_S_NFREELISTS]; 
   _Pthread_alloc_per_thread_state<_Max_size> * __next; 
 	// Free list link for list of available per thread structures.
@@ -88,9 +94,11 @@ public: // but only for internal use:
 
   enum {_S_ALIGN = __STL_DATA_ALIGNMENT};
 
+  //将字节上调至8的倍数
   static size_t _S_round_up(size_t __bytes) {
         return (((__bytes) + (int) _S_ALIGN-1) & ~((int) _S_ALIGN - 1));
   }
+  //根据区块的大小决定使用第几号free-lists，n从0开始计数
   static size_t _S_freelist_index(size_t __bytes) {
         return (((__bytes) + (int) _S_ALIGN-1)/(int)_S_ALIGN - 1);
   }
@@ -132,6 +140,7 @@ public:
     __obj * __RESTRICT __result;
     _Pthread_alloc_per_thread_state<_Max_size>* __a;
 
+    //调用第一级配置器
     if (__n > _Max_size) {
         return(malloc_alloc::allocate(__n));
     }
@@ -140,12 +149,15 @@ public:
                                  pthread_getspecific(_S_key))) {
         __a = _S_get_per_thread_state();
     }
+    //寻找合适的free-lists
     __my_free_list = __a -> __free_list + _S_freelist_index(__n);
     __result = *__my_free_list;
+    //如果没有找到可用的free list，准备重新填充free list
     if (__result == 0) {
         void *__r = __a -> _M_refill(_S_round_up(__n));
         return __r;
     }
+    //调整free list
     *__my_free_list = __result -> __free_list_link;
     return (__result);
   };

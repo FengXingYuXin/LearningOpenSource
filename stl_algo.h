@@ -286,7 +286,7 @@ _ForwardIter1 search(_ForwardIter1 __first1, _ForwardIter1 __last1,
 {
   // Test for empty ranges
   if (__first1 == __last1 || __first2 == __last2)
-    return __first1;
+    return __first1;//如果__first1==__last1，返回__first1或者__last1表示查找失败；如果__first2==__last2，返回__first1表示查找成功
 
   // Test for a pattern of length 1.
   _ForwardIter2 __tmp(__first2);
@@ -314,14 +314,14 @@ _ForwardIter1 search(_ForwardIter1 __first1, _ForwardIter1 __last1,
 
     while (*__current == *__p) {
       if (++__p == __last2)
-        return __first1;
+        return __first1;//表示查找成功
       if (++__current == __last1)
         return __last1;
     }
 
     ++__first1;
   }
-  return __first1;
+  return __first1;//此时__first1==__last1，表示查找失败
 }
 
 template <class _ForwardIter1, class _ForwardIter2, class _BinaryPred>

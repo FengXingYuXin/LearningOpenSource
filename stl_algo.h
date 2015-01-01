@@ -85,7 +85,7 @@ _Function for_each(_InputIter __first, _InputIter __last, _Function __f) {
 }
 
 // find and find_if.
-
+//版本1
 template <class _InputIter, class _Tp>
 inline _InputIter find(_InputIter __first, _InputIter __last,
                        const _Tp& __val,
@@ -108,6 +108,7 @@ inline _InputIter find_if(_InputIter __first, _InputIter __last,
 
 #ifdef __STL_CLASS_PARTIAL_SPECIALIZATION
 
+//版本2
 template <class _RandomAccessIter, class _Tp>
 _RandomAccessIter find(_RandomAccessIter __first, _RandomAccessIter __last,
                        const _Tp& __val,
@@ -186,6 +187,8 @@ _RandomAccessIter find_if(_RandomAccessIter __first, _RandomAccessIter __last,
 
 #endif /* __STL_CLASS_PARTIAL_SPECIALIZATION */
 
+//find与find_if的接口函数；
+//版本2与版本1的区别：通过对first!=last的替代，使得循环终止的比较次数减少了接近75%左右
 template <class _InputIter, class _Tp>
 inline _InputIter find(_InputIter __first, _InputIter __last,
                        const _Tp& __val)

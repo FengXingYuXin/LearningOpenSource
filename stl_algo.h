@@ -829,6 +829,7 @@ _RandomAccessIter __rotate(_RandomAccessIter __first,
   return __result;
 }
 
+//rotate接口函数
 template <class _ForwardIter>
 inline _ForwardIter rotate(_ForwardIter __first, _ForwardIter __middle,
                            _ForwardIter __last) {
@@ -921,6 +922,9 @@ _OutputIter random_sample_n(_ForwardIter __first, _ForwardIter __last,
   return __out;
 }
 
+//Random_sample randomly copies a sample of the elements from the range [first, last) 
+//into the range [ofirst, olast). Each element in the input range appears at most once
+//in the output range, and samples are chosen with uniform probability
 template <class _InputIter, class _RandomAccessIter, class _Distance>
 _RandomAccessIter __random_sample(_InputIter __first, _InputIter __last,
                                   _RandomAccessIter __out,
@@ -1023,6 +1027,8 @@ _BidirectionalIter __partition(_BidirectionalIter __first,
         ++__first;
       else
         break;
+   //while(__first!=__last&&__pred(*__first))++__first;
+   //if(__first==__last)return __first;
     --__last;
     while (true)
       if (__first == __last)
@@ -1031,11 +1037,14 @@ _BidirectionalIter __partition(_BidirectionalIter __first,
         --__last;
       else
         break;
+  //while(__first!=__last&&!__pred(*__last))--__last;
+  //if(__first==__last)return __first;
     iter_swap(__first, __last);
     ++__first;
   }
 }
 
+//partition的接口函数
 template <class _ForwardIter, class _Predicate>
 inline _ForwardIter partition(_ForwardIter __first,
    			      _ForwardIter __last,

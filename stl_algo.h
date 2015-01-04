@@ -337,7 +337,7 @@ _ForwardIter1 search(_ForwardIter1 __first1, _ForwardIter1 __last1,
   _ForwardIter2 __tmp(__first2);
   ++__tmp;
   if (__tmp == __last2) {
-    while (__first1 != __last1 && !__predicate(*__first1, *__first2))
+    while (__first1 != __last1 && !__predicate(*__first1, *__first2))//没有相应形式的find_if函数版本
       ++__first1;
     return __first1;    
   }
@@ -351,11 +351,11 @@ _ForwardIter1 search(_ForwardIter1 __first1, _ForwardIter1 __last1,
   _ForwardIter1 __current = __first1;
 
   while (__first1 != __last1) {
-    while (__first1 != __last1) {
-      if (__predicate(*__first1, *__first2))
-        break;
-      ++__first1;
-    }
+    //while (__first1 != __last1) {
+    //  if (__predicate(*__first1, *__first2))
+    //    break;
+    //  ++__first1;
+    //}
     while (__first1 != __last1 && !__predicate(*__first1, *__first2))
       ++__first1;
     if (__first1 == __last1)
@@ -431,7 +431,7 @@ _ForwardIter search_n(_ForwardIter __first, _ForwardIter __last,
             break;
           ++__i;
         }
-        __first = __i;
+        __first = __i;//找到下一个满足条件的第一个值
       }
     }
     return __last;
@@ -586,7 +586,7 @@ inline _OutputIter __unique_copy(_InputIter __first, _InputIter __last,
 template <class _InputIter, class _ForwardIter>
 _ForwardIter __unique_copy(_InputIter __first, _InputIter __last,
                            _ForwardIter __result, forward_iterator_tag) {
-  *__result = *__first;
+  *__result = *__first;//省掉了中间变量__value
   while (++__first != __last)
     if (*__result != *__first) *++__result = *__first;
   return ++__result;
@@ -667,6 +667,8 @@ void __reverse(_BidirectionalIter __first, _BidirectionalIter __last,
       return;
     else
       iter_swap(__first++, __last);
+      
+  //while(__first!=last&&__first!=--__last)iter_swap(__first++,__last);
 }
 
 template <class _RandomAccessIter>
@@ -706,7 +708,7 @@ _EuclideanRingElement __gcd(_EuclideanRingElement __m,
   }
   return __m;
 }
-
+//有的元素可能需要多次的移动操作才能被放到正确的位置上
 template <class _ForwardIter, class _Distance>
 _ForwardIter __rotate(_ForwardIter __first,
                       _ForwardIter __middle,
@@ -719,7 +721,7 @@ _ForwardIter __rotate(_ForwardIter __first,
     return __first;
 
   _ForwardIter __first2 = __middle;
-  do {
+  do {//寻找新的分界点
     swap(*__first++, *__first2++);
     if (__first == __middle)
       __middle = __first2;
@@ -740,7 +742,7 @@ _ForwardIter __rotate(_ForwardIter __first,
   return __new_middle;
 }
 
-
+//每个元素需要3次操作才能被放到正确的位置上
 template <class _BidirectionalIter, class _Distance>
 _BidirectionalIter __rotate(_BidirectionalIter __first,
                             _BidirectionalIter __middle,
@@ -755,6 +757,8 @@ _BidirectionalIter __rotate(_BidirectionalIter __first,
   __reverse(__first,  __middle, bidirectional_iterator_tag());
   __reverse(__middle, __last,   bidirectional_iterator_tag());
 
+
+  //为了返回分界线，才将完整的逆转操作分段进行
   while (__first != __middle && __middle != __last)
     swap (*__first++, *--__last);
 
@@ -768,6 +772,7 @@ _BidirectionalIter __rotate(_BidirectionalIter __first,
   }
 }
 
+//只需要一次操作即可将一个元素移动到正确的位置上
 template <class _RandomAccessIter, class _Distance, class _Tp>
 _RandomAccessIter __rotate(_RandomAccessIter __first,
                            _RandomAccessIter __middle,
@@ -852,6 +857,7 @@ inline _Distance __random_number(_Distance __n) {
 }
 
 // random_shuffle
+//洗牌算法
 
 template <class _RandomAccessIter>
 inline void random_shuffle(_RandomAccessIter __first,

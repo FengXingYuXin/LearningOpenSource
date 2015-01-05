@@ -119,6 +119,8 @@ private:
   static void* _S_oom_realloc(void*, size_t);
 
 #ifndef __STL_STATIC_TEMPLATE_MEMBER_BUG
+//typedef static void (*handler)();
+//handler __mallloc_alloc_oom_handler;
   static void (* __malloc_alloc_oom_handler)();
 #endif
 
@@ -155,10 +157,11 @@ public:
 // malloc_alloc out-of-memory handling
 
 #ifndef __STL_STATIC_TEMPLATE_MEMBER_BUG
+//类内部的静态成员需要在类外部进行初始化
 template <int __inst>
 void (* __malloc_alloc_template<__inst>::__malloc_alloc_oom_handler)() = 0;
 #endif
-
+// 内存不足时，根据__malloc_alloc_oom_handler进行相应的处理
 template <int __inst>
 void*
 __malloc_alloc_template<__inst>::_S_oom_malloc(size_t __n)
@@ -192,13 +195,14 @@ void* __malloc_alloc_template<__inst>::_S_oom_realloc(void* __p, size_t __n)
 
 typedef __malloc_alloc_template<0> malloc_alloc;
 
+//_Alloc为所使用的空间配置器的类型
 template<class _Tp, class _Alloc>
 class simple_alloc {
 
 public:
-    static _Tp* allocate(size_t __n)
+    static _Tp* allocate(size_t __n)//将元素个数转换成字节个数
       { return 0 == __n ? 0 : (_Tp*) _Alloc::allocate(__n * sizeof (_Tp)); }
-    static _Tp* allocate(void)
+    static _Tp* allocate(void)//默认情况下分配一个元素的字节大小的空间
       { return (_Tp*) _Alloc::allocate(sizeof (_Tp)); }
     static void deallocate(_Tp* __p, size_t __n)
       { if (0 != __n) _Alloc::deallocate(__p, __n * sizeof (_Tp)); }

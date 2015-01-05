@@ -40,8 +40,8 @@ __STL_BEGIN_NAMESPACE
 
 class _Exception {
 public:
-  virtual ~_Exception() __STL_NOTHROW {}
-  virtual const char* what() const __STL_NOTHROW { return ""; }
+  virtual ~_Exception() __STL_NOTHROW {}//虚析构函数--作为基类被继承
+  virtual const char* what() const __STL_NOTHROW { return ""; }//返回异常的类型
 };
 
 #define __STL_EXCEPTION_BASE _Exception

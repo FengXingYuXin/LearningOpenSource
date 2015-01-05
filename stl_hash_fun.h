@@ -42,6 +42,8 @@ inline size_t __stl_hash_string(const char* __s)
   unsigned long __h = 0; 
   for ( ; *__s; ++__s)
     __h = 5*__h + *__s;
+    //mult=31,131,1313,13131,131313......;
+    //__h=mult*__h+*__s;
   
   return size_t(__h);
 }

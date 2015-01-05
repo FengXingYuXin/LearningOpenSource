@@ -1,3 +1,4 @@
+//空间配置器的实现
 /*
  * Copyright (c) 1996-1997
  * Silicon Graphics Computer Systems, Inc.

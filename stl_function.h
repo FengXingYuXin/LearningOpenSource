@@ -33,12 +33,16 @@
 
 __STL_BEGIN_NAMESPACE
 
+//unary_function用来呈现一元函数的参数型别和返回值型别
+//被一元仿函数继承
 template <class _Arg, class _Result>
 struct unary_function {
   typedef _Arg argument_type;
   typedef _Result result_type;
 };
 
+//binary_function用来呈现二元函数的两个参数型别和返回值型别
+//被二元仿函数继承
 template <class _Arg1, class _Arg2, class _Result>
 struct binary_function {
   typedef _Arg1 first_argument_type;
@@ -46,6 +50,7 @@ struct binary_function {
   typedef _Result result_type;
 };      
 
+//加减乘除四则运算的仿函数
 template <class _Tp>
 struct plus : public binary_function<_Tp,_Tp,_Tp> {
   _Tp operator()(const _Tp& __x, const _Tp& __y) const { return __x + __y; }
@@ -87,6 +92,7 @@ struct negate : public unary_function<_Tp,_Tp>
   _Tp operator()(const _Tp& __x) const { return -__x; }
 };
 
+//关系类的仿函数
 template <class _Tp>
 struct equal_to : public binary_function<_Tp,_Tp,bool> 
 {
@@ -123,6 +129,7 @@ struct less_equal : public binary_function<_Tp,_Tp,bool>
   bool operator()(const _Tp& __x, const _Tp& __y) const { return __x <= __y; }
 };
 
+//逻辑类的仿函数
 template <class _Tp>
 struct logical_and : public binary_function<_Tp,_Tp,bool>
 {
@@ -141,6 +148,7 @@ struct logical_not : public unary_function<_Tp,bool>
   bool operator()(const _Tp& __x) const { return !__x; }
 };
 
+//求解某个一元仿函数的逻辑负值
 template <class _Predicate>
 class unary_negate
   : public unary_function<typename _Predicate::argument_type, bool> {
@@ -160,6 +168,7 @@ not1(const _Predicate& __pred)
   return unary_negate<_Predicate>(__pred);
 }
 
+//求解某个二元仿函数的逻辑负值
 template <class _Predicate> 
 class binary_negate 
   : public binary_function<typename _Predicate::first_argument_type,
@@ -183,6 +192,7 @@ not2(const _Predicate& __pred)
   return binary_negate<_Predicate>(__pred);
 }
 
+//_Operation是一个二元仿函数
 template <class _Operation> 
 class binder1st
   : public unary_function<typename _Operation::second_argument_type,

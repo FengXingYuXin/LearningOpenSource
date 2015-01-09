@@ -33,6 +33,7 @@
 
 __STL_BEGIN_NAMESPACE
 
+//pair类型为一个具体类型
 template <class _T1, class _T2>
 struct pair {
   typedef _T1 first_type;

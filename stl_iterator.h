@@ -275,6 +275,7 @@ class reverse_iterator
 protected:
   _Iterator current;
 public:
+//traits编程技法，萃取相应的型别
   typedef typename iterator_traits<_Iterator>::iterator_category
           iterator_category;
   typedef typename iterator_traits<_Iterator>::value_type

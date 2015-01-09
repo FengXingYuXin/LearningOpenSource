@@ -121,6 +121,8 @@ struct iterator_traits<_Tp*> {
   typedef _Tp&                        reference;
 };
 
+
+//traits类，用于萃取内嵌型别
 template <class _Tp>
 struct iterator_traits<const _Tp*> {
   typedef random_access_iterator_tag iterator_category;
@@ -178,6 +180,7 @@ value_type(const _Iter& __i) { return __value_type(__i); }
 
 #else /* __STL_CLASS_PARTIAL_SPECIALIZATION */
 
+//这5个函数方便的返回迭代器的类型
 template <class _Tp, class _Distance> 
 inline input_iterator_tag 
 iterator_category(const input_iterator<_Tp, _Distance>&)
@@ -262,6 +265,10 @@ inline ptrdiff_t* distance_type(const _Tp*) { return (ptrdiff_t*)(0); }
 
 #endif /* __STL_CLASS_PARTIAL_SPECIALIZATION */
 
+
+//通过重载，是得在编译时期确定调用哪个版本的函数
+
+//__distance和__adwance函数
 template <class _InputIterator, class _Distance>
 inline void __distance(_InputIterator __first, _InputIterator __last,
                        _Distance& __n, input_iterator_tag)

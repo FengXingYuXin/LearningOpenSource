@@ -38,6 +38,8 @@ __STL_BEGIN_NAMESPACE
 
 // Heap-manipulation functions: push_heap, pop_heap, make_heap, sort_heap.
 
+//往一个大顶堆中添加元素，使得之后的数据仍然满足大顶堆的性质
+//__first表示数据的起始位置；__holeIndex表示新数据所在位置的距离标示；__topIndex表示根所在位置距离的标示；
 template <class _RandomAccessIterator, class _Distance, class _Tp>
 void 
 __push_heap(_RandomAccessIterator __first,

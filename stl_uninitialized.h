@@ -62,6 +62,7 @@ __uninitialized_copy_aux(_InputIter __first, _InputIter __last,
 }
 
 
+//__uninitialized_copy函数的接口函数
 template <class _InputIter, class _ForwardIter, class _Tp>
 inline _ForwardIter
 __uninitialized_copy(_InputIter __first, _InputIter __last,

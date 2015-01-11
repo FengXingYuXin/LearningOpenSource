@@ -60,9 +60,9 @@ public:
   
 protected:
   allocator_type _M_data_allocator;
-  _Tp* _M_start;
-  _Tp* _M_finish;
-  _Tp* _M_end_of_storage;
+  _Tp* _M_start;//数据开始存放的位置
+  _Tp* _M_finish;//数据存放的最后的位置
+  _Tp* _M_end_of_storage;//已分配的空间的最后的位置标示
 
   _Tp* _M_allocate(size_t __n)
     { return _M_data_allocator.allocate(__n); }
@@ -73,7 +73,7 @@ protected:
 // Specialization for allocators that have the property that we don't
 // actually have to store an allocator object.  
 template <class _Tp, class _Allocator>
-class _Vector_alloc_base<_Tp, _Allocator, true> {
+class _Vector_alloc_base<_Tp, _Allocator, true> {//上面那个模板类的专门化
 public:
   typedef typename _Alloc_traits<_Tp, _Allocator>::allocator_type
           allocator_type;
@@ -108,7 +108,7 @@ struct _Vector_base
   _Vector_base(const allocator_type& __a) : _Base(__a) {}
   _Vector_base(size_t __n, const allocator_type& __a) : _Base(__a) {
     _M_start = _M_allocate(__n);
-    _M_finish = _M_start;
+    _M_finish = _M_start;//初始情况下，没有任何数据
     _M_end_of_storage = _M_start + __n;
   }
 
@@ -192,6 +192,7 @@ protected:
   void _M_insert_aux(iterator __position);
 
 public:
+//两个begin和end函数都有两个重载版本
   iterator begin() { return _M_start; }
   const_iterator begin() const { return _M_start; }
   iterator end() { return _M_finish; }
@@ -208,8 +209,11 @@ public:
 
   size_type size() const
     { return size_type(end() - begin()); }
+  
+  //最多能容纳数据的个数
   size_type max_size() const
     { return size_type(-1) / sizeof(_Tp); }
+  
   size_type capacity() const
     { return size_type(_M_end_of_storage - begin()); }
   bool empty() const
@@ -345,6 +349,8 @@ public:
     else
       _M_insert_aux(end());
   }
+
+
   void swap(vector<_Tp, _Alloc>& __x) {
     __STD::swap(_M_start, __x._M_start);
     __STD::swap(_M_finish, __x._M_finish);
@@ -419,6 +425,12 @@ public:
   }
 
   void resize(size_type __new_size, const _Tp& __x) {
+    if (__new_size < size()) 
+      erase(begin() + __new_size, end());
+    else
+      insert(end(), __new_size - size(), __x);
+  }
+  void resize(size_type __new_size) {
     if (__new_size < size()) 
       erase(begin() + __new_size, end());
     else

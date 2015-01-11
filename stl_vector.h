@@ -335,7 +335,7 @@ public:
 
   void push_back(const _Tp& __x) {
     if (_M_finish != _M_end_of_storage) {
-      construct(_M_finish, __x);
+      construct(_M_finish, __x);//placement new
       ++_M_finish;
     }
     else

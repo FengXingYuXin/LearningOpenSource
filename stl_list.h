@@ -38,6 +38,7 @@ __STL_BEGIN_NAMESPACE
 #pragma set woff 1375
 #endif
 
+//结点类型的定义
 template <class _Tp>
 struct _List_node {
   typedef void* _Void_pointer;
@@ -46,6 +47,9 @@ struct _List_node {
   _Tp _M_data;
 };
 
+//迭代器类型的定义，封装了一个_List_node类型的指针
+//包括的内容有：迭代器的相关属性，构造函数，操作符重载（相等，不等，箭头操作符，解引用操作符，前置和后置的加加减减）；
+//本质上就是一个智能指针
 template<class _Tp, class _Ref, class _Ptr>
 struct _List_iterator {
   typedef _List_iterator<_Tp,_Tp&,_Tp*>             iterator;
@@ -96,20 +100,21 @@ struct _List_iterator {
 
 #ifndef __STL_CLASS_PARTIAL_SPECIALIZATION
 
+//方便地返回迭代器的类型
 template <class _Tp, class _Ref, class _Ptr>
 inline bidirectional_iterator_tag
 iterator_category(const _List_iterator<_Tp, _Ref, _Ptr>&)
 {
   return bidirectional_iterator_tag();
 }
-
+//方便地返回值类型
 template <class _Tp, class _Ref, class _Ptr>
 inline _Tp*
 value_type(const _List_iterator<_Tp, _Ref, _Ptr>&)
 {
   return 0;
 }
-
+//方便地返回距离类型
 template <class _Tp, class _Ref, class _Ptr>
 inline ptrdiff_t*
 distance_type(const _List_iterator<_Tp, _Ref, _Ptr>&)

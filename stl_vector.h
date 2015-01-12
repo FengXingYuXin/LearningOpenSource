@@ -59,13 +59,11 @@ __STL_BEGIN_NAMESPACE
 template <class _Tp, class _Allocator, bool _IsStatic>
 class _Vector_alloc_base {
 public:
-  typedef typename _Alloc_traits<_Tp, _Allocator>::allocator_type
-          allocator_type;
+  typedef typename _Alloc_traits<_Tp, _Allocator>::allocator_type allocator_type;
   allocator_type get_allocator() const { return _M_data_allocator; }
 
   _Vector_alloc_base(const allocator_type& __a)
-    : _M_data_allocator(__a), _M_start(0), _M_finish(0), _M_end_of_storage(0) 
-  {}
+    : _M_data_allocator(__a), _M_start(0), _M_finish(0), _M_end_of_storage(0) {}
   
 protected:
   allocator_type _M_data_allocator;
@@ -89,8 +87,7 @@ public:
   allocator_type get_allocator() const { return allocator_type(); }
 
   _Vector_alloc_base(const allocator_type&)
-    : _M_start(0), _M_finish(0), _M_end_of_storage(0) 
-  {}
+    : _M_start(0), _M_finish(0), _M_end_of_storage(0) {}
   
 protected:
   _Tp* _M_start;
@@ -268,13 +265,14 @@ public:
     _M_initialize_aux(__first, __last, _Integral());
   }
 
+//如果数据类型为整型，整体处理
   template <class _Integer>
   void _M_initialize_aux(_Integer __n, _Integer __value, __true_type) {
     _M_start = _M_allocate(__n);
     _M_end_of_storage = _M_start + __n; 
     _M_finish = uninitialized_fill_n(_M_start, __n, __value);
   }
-
+//如果数据不是整型，则一个一个地处理
   template <class _InputIterator>
   void _M_initialize_aux(_InputIterator __first, _InputIterator __last,
                          __false_type) {
@@ -389,11 +387,6 @@ public:
   }
 #ifdef __STL_MEMBER_TEMPLATES
   // Check whether it's an integral type.  If so, it's not an iterator.
-  template <class _InputIterator>
-  void insert(iterator __pos, _InputIterator __first, _InputIterator __last) {
-    typedef typename _Is_integer<_InputIterator>::_Integral _Integral;
-    _M_insert_dispatch(__pos, __first, __last, _Integral());
-  }
 
   template <class _Integer>
   void _M_insert_dispatch(iterator __pos, _Integer __n, _Integer __val,
@@ -405,6 +398,12 @@ public:
                           _InputIterator __first, _InputIterator __last,
                           __false_type) {
     _M_range_insert(__pos, __first, __last, __ITERATOR_CATEGORY(__first));
+  }
+  
+  template <class _InputIterator>
+  void insert(iterator __pos, _InputIterator __first, _InputIterator __last) {
+    typedef typename _Is_integer<_InputIterator>::_Integral _Integral;
+    _M_insert_dispatch(__pos, __first, __last, _Integral());
   }
 #else /* __STL_MEMBER_TEMPLATES */
   void insert(iterator __position,

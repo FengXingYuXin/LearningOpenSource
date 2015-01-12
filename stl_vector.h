@@ -333,6 +333,7 @@ public:
   reference back() { return *(end() - 1); }
   const_reference back() const { return *(end() - 1); }
 
+  //若该动作导致了内存的重新分配，那么vector的迭代器将会失效
   void push_back(const _Tp& __x) {
     if (_M_finish != _M_end_of_storage) {
       construct(_M_finish, __x);//placement new
@@ -350,7 +351,7 @@ public:
       _M_insert_aux(end());
   }
 
-
+//vector的交换只需要通过3个指针的交换即可完成
   void swap(vector<_Tp, _Alloc>& __x) {
     __STD::swap(_M_start, __x._M_start);
     __STD::swap(_M_finish, __x._M_finish);
@@ -408,7 +409,7 @@ public:
 
   void pop_back() {
     --_M_finish;
-    destroy(_M_finish);
+    destroy(_M_finish);//调用全局的析构函数
   }
   iterator erase(iterator __position) {
     if (__position + 1 != end())
@@ -640,7 +641,7 @@ void
 vector<_Tp, _Alloc>::_M_insert_aux(iterator __position, const _Tp& __x)
 {
   if (_M_finish != _M_end_of_storage) {
-    construct(_M_finish, *(_M_finish - 1));
+    construct(_M_finish, *(_M_finish - 1));//为copy_backward函数的调用作准备
     ++_M_finish;
     _Tp __x_copy = __x;
     copy_backward(__position, _M_finish - 2, _M_finish - 1);
@@ -651,7 +652,18 @@ vector<_Tp, _Alloc>::_M_insert_aux(iterator __position, const _Tp& __x)
     const size_type __len = __old_size != 0 ? 2 * __old_size : 1;
     iterator __new_start = _M_allocate(__len);
     iterator __new_finish = __new_start;
+    
+    //通过宏来控制是否使用异常处理机制
+    //#ifdef _USE_EXCEPTION
+    //#define __STL_TRY try
+    //#define __STL_UNWIND(action) catch(...) {action;throw;}
+    //#else
+    //#define __STL_TRY
+    //#define __STL_UNWIND(action)
+    //#endif
+    
     __STL_TRY {
+      //将原来vector中的数据拷贝到新的vector中：(_M_start,__position);__x;(__position,_M_finish)
       __new_finish = uninitialized_copy(_M_start, __position, __new_start);
       construct(__new_finish, __x);
       ++__new_finish;
@@ -659,8 +671,10 @@ vector<_Tp, _Alloc>::_M_insert_aux(iterator __position, const _Tp& __x)
     }
     __STL_UNWIND((destroy(__new_start,__new_finish), 
                   _M_deallocate(__new_start,__len)));
+    //释放原来的数据             
     destroy(begin(), end());
     _M_deallocate(_M_start, _M_end_of_storage - _M_start);
+    //调整迭代器
     _M_start = __new_start;
     _M_finish = __new_finish;
     _M_end_of_storage = __new_start + __len;
@@ -707,6 +721,8 @@ void vector<_Tp, _Alloc>::_M_fill_insert(iterator __position, size_type __n,
       _Tp __x_copy = __x;
       const size_type __elems_after = _M_finish - __position;
       iterator __old_finish = _M_finish;
+      
+      //__elems_after与__n的关系决定了处理方式的不同
       if (__elems_after > __n) {
         uninitialized_copy(_M_finish - __n, _M_finish, _M_finish);
         _M_finish += __n;
@@ -729,13 +745,14 @@ void vector<_Tp, _Alloc>::_M_fill_insert(iterator __position, size_type __n,
       __STL_TRY {
         __new_finish = uninitialized_copy(_M_start, __position, __new_start);
         __new_finish = uninitialized_fill_n(__new_finish, __n, __x);
-        __new_finish
-          = uninitialized_copy(__position, _M_finish, __new_finish);
+        __new_finish = uninitialized_copy(__position, _M_finish, __new_finish);
       }
       __STL_UNWIND((destroy(__new_start,__new_finish), 
                     _M_deallocate(__new_start,__len)));
+                    
       destroy(_M_start, _M_finish);
       _M_deallocate(_M_start, _M_end_of_storage - _M_start);
+      
       _M_start = __new_start;
       _M_finish = __new_finish;
       _M_end_of_storage = __new_start + __len;
@@ -792,6 +809,7 @@ vector<_Tp, _Alloc>::_M_range_insert(iterator __position,
       const size_type __len = __old_size + max(__old_size, __n);
       iterator __new_start = _M_allocate(__len);
       iterator __new_finish = __new_start;
+      
       __STL_TRY {
         __new_finish = uninitialized_copy(_M_start, __position, __new_start);
         __new_finish = uninitialized_copy(__first, __last, __new_finish);
@@ -800,8 +818,10 @@ vector<_Tp, _Alloc>::_M_range_insert(iterator __position,
       }
       __STL_UNWIND((destroy(__new_start,__new_finish), 
                     _M_deallocate(__new_start,__len)));
+                    
       destroy(_M_start, _M_finish);
       _M_deallocate(_M_start, _M_end_of_storage - _M_start);
+      
       _M_start = __new_start;
       _M_finish = __new_finish;
       _M_end_of_storage = __new_start + __len;

@@ -47,7 +47,7 @@ struct _List_node {
   _Tp _M_data;
 };
 
-//迭代器类型的定义，封装了一个_List_node类型的指针
+//迭代器的设计，封装了一个_List_node类型的指针
 //包括的内容有：迭代器的相关属性，构造函数，操作符重载（相等，不等，箭头操作符，解引用操作符，前置和后置的加加减减）；
 //本质上就是一个智能指针
 template<class _Tp, class _Ref, class _Ptr>
@@ -132,12 +132,15 @@ distance_type(const _List_iterator<_Tp, _Ref, _Ptr>&)
 // compatibility and because we want to avoid wasting storage on an 
 // allocator instance if it isn't necessary.
 
+
+//通过增加一个空的节点，很好地实现了左闭右开的统一规范
 #ifdef __STL_USE_STD_ALLOCATORS
 
 // Base for general standard-conforming allocators.
 template <class _Tp, class _Allocator, bool _IsStatic>
 class _List_alloc_base {
 public:
+//泛型的分配器类型
   typedef typename _Alloc_traits<_Tp, _Allocator>::allocator_type
           allocator_type;
   allocator_type get_allocator() const { return _Node_allocator; }
@@ -145,12 +148,14 @@ public:
   _List_alloc_base(const allocator_type& __a) : _Node_allocator(__a) {}
 
 protected:
+//分配节点和释放节点的操作
   _List_node<_Tp>* _M_get_node()
    { return _Node_allocator.allocate(1); }
   void _M_put_node(_List_node<_Tp>* __p)
     { _Node_allocator.deallocate(__p, 1); }
 
 protected:
+//以_list_node为单位的分配器
   typename _Alloc_traits<_List_node<_Tp>, _Allocator>::allocator_type
            _Node_allocator;
   _List_node<_Tp>* _M_node;
@@ -178,6 +183,7 @@ protected:
 };
 
 template <class _Tp, class _Alloc>
+//根据需求选择合适的分配器类型
 class _List_base 
   : public _List_alloc_base<_Tp, _Alloc,
                             _Alloc_traits<_Tp, _Alloc>::_S_instanceless>
@@ -241,9 +247,11 @@ _List_base<_Tp,_Alloc>::clear()
   while (__cur != _M_node) {
     _List_node<_Tp>* __tmp = __cur;
     __cur = (_List_node<_Tp>*) __cur->_M_next;
+    //先调用析构函数，然后释放空间
     destroy(&__tmp->_M_data);
     _M_put_node(__tmp);
   }
+  //空表的条件设置
   _M_node->_M_next = _M_node;
   _M_node->_M_prev = _M_node;
 }
@@ -391,10 +399,13 @@ public:
   iterator erase(iterator __position) {
     _Node* __next_node = (_Node*) (__position._M_node->_M_next);
     _Node* __prev_node = (_Node*) (__position._M_node->_M_prev);
+    
     __prev_node->_M_next = __next_node;
     __next_node->_M_prev = __prev_node;
+    
     destroy(&__position._M_node->_M_data);
     _M_put_node(__position._M_node);
+    
     return iterator(__next_node);
   }
   iterator erase(iterator __first, iterator __last);
@@ -754,6 +765,8 @@ void list<_Tp, _Alloc>::reverse()
   }
 }    
 
+//一种针对链表排序很好的处理方法，时间复杂度为O(N*LOG(N),空间复杂度为O(1)；
+//自底向上的归并排序策略
 template <class _Tp, class _Alloc>
 void list<_Tp, _Alloc>::sort()
 {

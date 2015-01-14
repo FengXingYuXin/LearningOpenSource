@@ -94,6 +94,8 @@ __deque_buf_size(size_t __n, size_t __size)
   return __n != 0 ? __n : (__size < 512 ? size_t(512 / __size) : size_t(1));
 }
 
+
+//针对分段连续的内存结构，设置对应的迭代器类型
 #ifndef __STL_NON_TYPE_TMPL_PARAM_BUG
 template <class _Tp, class _Ref, class _Ptr, size_t __bufsiz>
 struct _Deque_iterator {
@@ -116,14 +118,15 @@ struct _Deque_iterator {
   typedef _Ref reference;
   typedef size_t size_type;
   typedef ptrdiff_t difference_type;
+  
   typedef _Tp** _Map_pointer;
 
   typedef _Deque_iterator _Self;
 
-  _Tp* _M_cur;
-  _Tp* _M_first;
-  _Tp* _M_last;
-  _Map_pointer _M_node;
+  _Tp* _M_cur;//指向缓冲区的现行元素
+  _Tp* _M_first;//指向缓冲区的头
+  _Tp* _M_last;//指向缓冲区的尾
+  _Map_pointer _M_node;//指向管控中心
 
   _Deque_iterator(_Tp* __x, _Map_pointer __y) 
     : _M_cur(__x), _M_first(*__y),
@@ -171,6 +174,7 @@ struct _Deque_iterator {
     return __tmp;
   }
 
+//该函数短小精炼
   _Self& operator+=(difference_type __n)
   {
     difference_type __offset = __n + (_M_cur - _M_first);

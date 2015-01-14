@@ -145,7 +145,8 @@ struct _Deque_iterator {
     return difference_type(_S_buffer_size()) * (_M_node - __x._M_node - 1) +
       (_M_cur - _M_first) + (__x._M_last - __x._M_cur);
   }
-
+//前置的增减操作可以叠加，但是后置的增减操作不能叠加
+//前置的增减操作返回的是引用，后置的返回的是本身
   _Self& operator++() {
     ++_M_cur;
     if (_M_cur == _M_last) {
@@ -174,7 +175,8 @@ struct _Deque_iterator {
     return __tmp;
   }
 
-//该函数短小精炼
+//实现迭代器的随机存取
+//_n可以为正，也可以为负
   _Self& operator+=(difference_type __n)
   {
     difference_type __offset = __n + (_M_cur - _M_first);
@@ -190,7 +192,8 @@ struct _Deque_iterator {
     }
     return *this;
   }
-
+//重载操作符时，先处理符合操作符，然后用符合操作符去实现普通的运算符
+//通过op=来实现op函数
   _Self operator+(difference_type __n) const
   {
     _Self __tmp = *this;
@@ -216,6 +219,7 @@ struct _Deque_iterator {
   bool operator<=(const _Self& __x) const { return !(__x < *this); }
   bool operator>=(const _Self& __x) const { return !(*this < __x); }
 
+//辅助函数
   void _M_set_node(_Map_pointer __new_node) {
     _M_node = __new_node;
     _M_first = *__new_node;

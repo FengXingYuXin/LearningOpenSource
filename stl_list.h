@@ -485,6 +485,7 @@ public:
 #endif /* __STL_MEMBER_TEMPLATES */
 
 protected:
+//transfer函数作为辅助函数使用，时间复杂度为O（1）
   void transfer(iterator __position, iterator __first, iterator __last) {
     if (__position != __last) {
       // Remove [first, last) from its old position.
@@ -501,6 +502,7 @@ protected:
   }
 
 public:
+//splice函数时间复杂度为O（1）
   void splice(iterator __position, list& __x) {
     if (!__x.empty()) 
       transfer(__position, __x.begin(), __x.end());

@@ -37,12 +37,12 @@ __STL_BEGIN_NAMESPACE
 
 // construct and destroy.  These functions are not part of the C++ standard,
 // and are provided for backward compatibility with the HP STL.
-
+//destroy函数调用相应类型的析构函数
 template <class _Tp>
 inline void destroy(_Tp* __pointer) {
   __pointer->~_Tp();
 }
-
+//在指定位置上调用相应类型的构造函数
 template <class _T1, class _T2>
 inline void construct(_T1* __p, const _T2& __value) {
   new (__p) _T1(__value);
@@ -68,16 +68,16 @@ template <class _ForwardIterator, class _Tp>
 inline void 
 __destroy(_ForwardIterator __first, _ForwardIterator __last, _Tp*)
 {
-  typedef typename __type_traits<_Tp>::has_trivial_destructor
-          _Trivial_destructor;
+  typedef typename __type_traits<_Tp>::has_trivial_destructor _Trivial_destructor;
   __destroy_aux(__first, __last, _Trivial_destructor());
 }
-
+//接口函数：destroy;只有要删除一个区间时，才需要元素类型有没有trivial constructor
 template <class _ForwardIterator>
 inline void destroy(_ForwardIterator __first, _ForwardIterator __last) {
   __destroy(__first, __last, __VALUE_TYPE(__first));
 }
 
+//trivial destructors
 inline void destroy(char*, char*) {}
 inline void destroy(wchar_t*, wchar_t*) {}
 

@@ -169,10 +169,10 @@ __malloc_alloc_template<__inst>::_S_oom_malloc(size_t __n)
     void (* __my_malloc_handler)();
     void* __result;
 
-    for (;;) {
+    for (;;) {//循环以下操作
         __my_malloc_handler = __malloc_alloc_oom_handler;
-        if (0 == __my_malloc_handler) { __THROW_BAD_ALLOC; }
-        (*__my_malloc_handler)();
+        if (0 == __my_malloc_handler) { __THROW_BAD_ALLOC; }//如果没有定义处理方法，则抛出异常
+        (*__my_malloc_handler)();//否则，调用已经设置好的方法
         __result = malloc(__n);
         if (__result) return(__result);
     }
@@ -204,6 +204,7 @@ public:
       { return 0 == __n ? 0 : (_Tp*) _Alloc::allocate(__n * sizeof (_Tp)); }
     static _Tp* allocate(void)//默认情况下分配一个元素的字节大小的空间
       { return (_Tp*) _Alloc::allocate(sizeof (_Tp)); }
+      
     static void deallocate(_Tp* __p, size_t __n)
       { if (0 != __n) _Alloc::deallocate(__p, __n * sizeof (_Tp)); }
     static void deallocate(_Tp* __p)

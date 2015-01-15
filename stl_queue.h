@@ -34,7 +34,7 @@
 __STL_BEGIN_NAMESPACE
 
 // Forward declarations of operators < and ==, needed for friend declaration.
-
+//默认的内含容器类型为deque
 template <class _Tp, 
           class _Sequence __STL_DEPENDENT_DEFAULT_TMPL(deque<_Tp>) >
 class queue;
@@ -132,6 +132,7 @@ operator>=(const queue<_Tp, _Sequence>& __x, const queue<_Tp, _Sequence>& __y)
 
 #endif /* __STL_FUNCTION_TMPL_PARTIAL_ORDER */
 
+//通过heap算法来实现优先队列的的建立，插入与删除，很好地保证了时间复杂度
 template <class _Tp, 
           class _Sequence __STL_DEPENDENT_DEFAULT_TMPL(deque<_Tp>),
           class _Compare

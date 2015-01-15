@@ -1,3 +1,8 @@
+//deque的优点：
+//A 在两端进行插入和删除操作均为常数时间；B随机存取迭代器类型，更好地选择泛型算法
+//deque的缺点：
+//A 复杂的迭代器架构；
+//deque实际上是vector和list的折中
 /*
  *
  * Copyright (c) 1994
@@ -95,7 +100,7 @@ __deque_buf_size(size_t __n, size_t __size)
 }
 
 
-//针对分段连续的内存结构，设置对应的迭代器类型
+//针对分段连续的内存结构，设置的迭代器类型,维护整体连续的假象
 #ifndef __STL_NON_TYPE_TMPL_PARAM_BUG
 template <class _Tp, class _Ref, class _Ptr, size_t __bufsiz>
 struct _Deque_iterator {

@@ -34,7 +34,8 @@
 __STL_BEGIN_NAMESPACE
 
 // Forward declarations of operators == and <, needed for friend declaration.
-
+//默认情况下的容器类型为deque，因为vector内存动态增长的时间耗费太大
+//拟容器stack的几个基本操作均是通过转调内含容器的相应操作来实现
 template <class _Tp, 
           class _Sequence __STL_DEPENDENT_DEFAULT_TMPL(deque<_Tp>) >
 class stack;

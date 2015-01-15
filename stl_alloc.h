@@ -110,6 +110,7 @@ __STL_BEGIN_NAMESPACE
 # endif
 #endif
 
+//第一级配置器：__malloc_alloc_template
 template <int __inst>
 class __malloc_alloc_template {
 
@@ -195,7 +196,9 @@ void* __malloc_alloc_template<__inst>::_S_oom_realloc(void* __p, size_t __n)
 
 typedef __malloc_alloc_template<0> malloc_alloc;
 
-//_Alloc为所使用的空间配置器的类型
+
+
+//为了使配置器的接口符合STL的标准，SGI又为配置器包装了一层接口：simple_alloc
 template<class _Tp, class _Alloc>
 class simple_alloc {
 
@@ -294,6 +297,8 @@ typedef malloc_alloc single_client_alloc;
   enum {_NFREELISTS = 16}; // _MAX_BYTES/_ALIGN
 #endif
 
+
+//第二级配置器：__default_alloc_template
 template <bool threads, int inst>
 class __default_alloc_template {
 
@@ -578,6 +583,8 @@ __default_alloc_template<__threads, __inst> ::_S_free_list[
 
 #ifdef __STL_USE_STD_ALLOCATORS
 
+
+//allocator类供程序员使用，提供类型化的内存分配以及对象构造与撤销
 template <class _Tp>
 class allocator {
   typedef alloc _Alloc;          // The underlying allocator.
@@ -654,6 +661,7 @@ inline bool operator!=(const allocator<_T1>&, const allocator<_T2>&)
 // member functions are static member functions.  Note, also, that 
 // __allocator<_Tp, alloc> is essentially the same thing as allocator<_Tp>.
 
+//_allocator是Allocator adaptor,以下两个类跟以上两个类分别对应
 template <class _Tp, class _Alloc>
 struct __allocator {
   _Alloc __underlying_alloc;

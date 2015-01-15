@@ -58,7 +58,7 @@ __slist_previous(const _Slist_node_base* __head,
     __head = __head->_M_next;
   return __head;
 }
-
+//拼接操作：将（__before_first,__before_last]拼接到__pos后面
 inline void __slist_splice_after(_Slist_node_base* __pos,
                                  _Slist_node_base* __before_first,
                                  _Slist_node_base* __before_last)
@@ -105,13 +105,13 @@ inline size_t __slist_size(_Slist_node_base* __node)
     ++__result;
   return __result;
 }
-
+//两级架构实现链表：_Slist_node_base;_Slist_node;
 template <class _Tp>
 struct _Slist_node : public _Slist_node_base
 {
   _Tp _M_data;
 };
-
+//两级架构实现单链表迭代器：_Slist_iterator_base;_Slist_iterator
 struct _Slist_iterator_base
 {
   typedef size_t               size_type;
@@ -248,7 +248,7 @@ struct _Slist_base
   ~_Slist_base() { _M_erase_after(&_M_head, 0); }
 
 protected:
-
+//删除__pos后面的一个元素
   _Slist_node_base* _M_erase_after(_Slist_node_base* __pos)
   {
     _Slist_node<_Tp>* __next = (_Slist_node<_Tp>*) (__pos->_M_next);
@@ -293,6 +293,7 @@ protected:
 
 #endif /* __STL_USE_STD_ALLOCATORS */
 
+//删除区间（__before_first,__last_node)内的节点
 template <class _Tp, class _Alloc> 
 _Slist_node_base*
 _Slist_base<_Tp,_Alloc>::_M_erase_after(_Slist_node_base* __before_first,

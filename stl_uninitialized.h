@@ -33,13 +33,14 @@
 
 __STL_BEGIN_NAMESPACE
 
-// uninitialized_copy
+// uninitialized_copy的调用可以分为两种情况：
+// A 对于非POD类型，分别在未初始化内存上分别调用元素的构造函数；
+// B 对于POD类型，赚调memmov函数
 
 // Valid if copy construction is equivalent to assignment, and if the
 //  destructor is trivial.
 template <class _InputIter, class _ForwardIter>
-inline _ForwardIter 
-__uninitialized_copy_aux(_InputIter __first, _InputIter __last,
+inline _ForwardIter  __uninitialized_copy_aux(_InputIter __first, _InputIter __last,
                          _ForwardIter __result,
                          __true_type)
 {
@@ -47,8 +48,7 @@ __uninitialized_copy_aux(_InputIter __first, _InputIter __last,
 }
 
 template <class _InputIter, class _ForwardIter>
-_ForwardIter 
-__uninitialized_copy_aux(_InputIter __first, _InputIter __last,
+_ForwardIter  __uninitialized_copy_aux(_InputIter __first, _InputIter __last,
                          _ForwardIter __result,
                          __false_type)
 {
@@ -63,6 +63,7 @@ __uninitialized_copy_aux(_InputIter __first, _InputIter __last,
 
 
 //__uninitialized_copy函数的接口函数
+//POD:plain old data
 template <class _InputIter, class _ForwardIter, class _Tp>
 inline _ForwardIter
 __uninitialized_copy(_InputIter __first, _InputIter __last,
@@ -73,8 +74,7 @@ __uninitialized_copy(_InputIter __first, _InputIter __last,
 }
 
 template <class _InputIter, class _ForwardIter>
-inline _ForwardIter
-  uninitialized_copy(_InputIter __first, _InputIter __last,
+inline _ForwardIter  uninitialized_copy(_InputIter __first, _InputIter __last,
                      _ForwardIter __result)
 {
   return __uninitialized_copy(__first, __last, __result,
@@ -161,7 +161,7 @@ __uninitialized_fill_aux(_ForwardIter __first, _ForwardIter __last,
   }
   __STL_UNWIND(destroy(__first, __cur));
 }
-
+//__uninitialized_fill函数
 template <class _ForwardIter, class _Tp, class _Tp1>
 inline void __uninitialized_fill(_ForwardIter __first, 
                                  _ForwardIter __last, const _Tp& __x, _Tp1*)

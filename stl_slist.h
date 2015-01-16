@@ -32,6 +32,7 @@ struct _Slist_node_base
   _Slist_node_base* _M_next;
 };
 
+//把__new_node插入到__prev_node后面
 inline _Slist_node_base*
 __slist_make_link(_Slist_node_base* __prev_node,
                   _Slist_node_base* __new_node)
@@ -40,7 +41,7 @@ __slist_make_link(_Slist_node_base* __prev_node,
   __prev_node->_M_next = __new_node;
   return __new_node;
 }
-
+//查找__node前面的那个结点
 inline _Slist_node_base* 
 __slist_previous(_Slist_node_base* __head,
                  const _Slist_node_base* __node)
@@ -71,7 +72,7 @@ inline void __slist_splice_after(_Slist_node_base* __pos,
     __before_last->_M_next = __after;
   }
 }
-
+//将__head所指向的单链表拼接到__pos后面
 inline void
 __slist_splice_after(_Slist_node_base* __pos, _Slist_node_base* __head)
 {
@@ -83,7 +84,7 @@ __slist_splice_after(_Slist_node_base* __pos, _Slist_node_base* __head)
     __before_last->_M_next = __after;
   }
 }
-
+//翻转单链表，没有头结点
 inline _Slist_node_base* __slist_reverse(_Slist_node_base* __node)
 {
   _Slist_node_base* __result = __node;
@@ -209,8 +210,8 @@ protected:
 
 protected:
   typename _Alloc_traits<_Slist_node<_Tp>,_Allocator>::allocator_type
-           _M_node_allocator;
-  _Slist_node_base _M_head;
+           _M_node_allocator;//配置器
+  _Slist_node_base _M_head;//头指针
 };
 
 // Specialization for instanceless allocators.
@@ -310,7 +311,7 @@ _Slist_base<_Tp,_Alloc>::_M_erase_after(_Slist_node_base* __before_first,
 }
 
 template <class _Tp, class _Alloc = __STL_DEFAULT_ALLOCATOR(_Tp) >
-class slist : private _Slist_base<_Tp,_Alloc>
+class slist : private _Slist_base<_Tp,_Alloc>//私有继承方式
 {
 private:
   typedef _Slist_base<_Tp,_Alloc> _Base;
@@ -996,6 +997,7 @@ void slist<_Tp,_Alloc>::sort(_StrictWeakOrdering __comp)
 
 #ifdef __STL_CLASS_PARTIAL_SPECIALIZATION
 
+//insert_iterator:迭代器配接器，拟迭代器
 template <class _Tp, class _Alloc>
 class insert_iterator<slist<_Tp, _Alloc> > {
 protected:

@@ -107,8 +107,10 @@ struct _Rb_tree_base_iterator
   
   typedef bidirectional_iterator_tag iterator_category;
   typedef ptrdiff_t difference_type;
+  
   _Base_ptr _M_node;
 
+//_M_increment函数和_M_decrement函数的时间复杂度都是o(logN)
 //求解下一个节点：有3种情况
   void _M_increment()
   {
@@ -117,7 +119,7 @@ struct _Rb_tree_base_iterator
       while (_M_node->_M_left != 0)
         _M_node = _M_node->_M_left;
     }
-    else {如果没有右子树
+    else {//如果没有右子树
       _Base_ptr __y = _M_node->_M_parent;
       while (_M_node == __y->_M_right) {//第2种情况：向上寻找最低祖先节点，并且要求当前节点为父亲节点的左孩子，若
         _M_node = __y;                  //此时满足_M_node==__y->_M_left,则__y节点即为解答；
@@ -130,16 +132,16 @@ struct _Rb_tree_base_iterator
 
   void _M_decrement()
   {
-    if (_M_node->_M_color == _S_rb_tree_red &&
+    if (_M_node->_M_color == _S_rb_tree_red &&//针对特殊的情况：此时_M_node为header；
         _M_node->_M_parent->_M_parent == _M_node)
       _M_node = _M_node->_M_right;
-    else if (_M_node->_M_left != 0) {
+    else if (_M_node->_M_left != 0) {//情况2：当_M_node有左孩子时，左子树的最大值即为解答；
       _Base_ptr __y = _M_node->_M_left;
       while (__y->_M_right != 0)
         __y = __y->_M_right;
       _M_node = __y;
     }
-    else {
+    else {//情况3：向上寻找分界点，如果_M_node==__y->_M_right，则此时__y即为解答。
       _Base_ptr __y = _M_node->_M_parent;
       while (_M_node == __y->_M_left) {
         _M_node = __y;
@@ -153,19 +155,20 @@ struct _Rb_tree_base_iterator
 template <class _Value, class _Ref, class _Ptr>
 struct _Rb_tree_iterator : public _Rb_tree_base_iterator
 {
+  //迭代器的另外3种性别属性
   typedef _Value value_type;
   typedef _Ref reference;
   typedef _Ptr pointer;
-  typedef _Rb_tree_iterator<_Value, _Value&, _Value*>             
-    iterator;
-  typedef _Rb_tree_iterator<_Value, const _Value&, const _Value*> 
-    const_iterator;
-  typedef _Rb_tree_iterator<_Value, _Ref, _Ptr>                   
-    _Self;
+  
+  typedef _Rb_tree_iterator<_Value, _Value&, _Value*> iterator;
+  typedef _Rb_tree_iterator<_Value, const _Value&, const _Value*> const_iterator;
+  typedef _Rb_tree_iterator<_Value, _Ref, _Ptr> _Self;
+  
   typedef _Rb_tree_node<_Value>* _Link_type;
 
+//3个构造函数
   _Rb_tree_iterator() {}
-  _Rb_tree_iterator(_Link_type __x) { _M_node = __x; }
+  _Rb_tree_iterator(_Link_type __x) { _M_node = __x; }//_Rb_tree_node<_Value>*类型到_Rb_tree_node_base*类型的转换
   _Rb_tree_iterator(const iterator& __it) { _M_node = __it._M_node; }
 
   reference operator*() const { return _Link_type(_M_node)->_M_value_field; }

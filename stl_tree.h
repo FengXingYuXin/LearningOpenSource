@@ -112,19 +112,19 @@ struct _Rb_tree_base_iterator
 //求解下一个节点：有3种情况
   void _M_increment()
   {
-    if (_M_node->_M_right != 0) {//第1种情况--结束
+    if (_M_node->_M_right != 0) {//第1种情况：如果有右孩子，则右子树的最小值节点即为解答；
       _M_node = _M_node->_M_right;
       while (_M_node->_M_left != 0)
         _M_node = _M_node->_M_left;
     }
-    else {
+    else {如果没有右子树
       _Base_ptr __y = _M_node->_M_parent;
-      while (_M_node == __y->_M_right) {//第2种情况，转到3
-        _M_node = __y;
+      while (_M_node == __y->_M_right) {//第2种情况：向上寻找最低祖先节点，并且要求当前节点为父亲节点的左孩子，若
+        _M_node = __y;                  //此时满足_M_node==__y->_M_left,则__y节点即为解答；
         __y = __y->_M_parent;
       }
-      if (_M_node->_M_right != __y)//第3种情况--结束
-        _M_node = __y;
+      if (_M_node->_M_right != __y)//第3种情况：若此时满足_M_node->_M_right==__y,则是在寻找根节点的下一节点，配合
+        _M_node = __y;             //其它结构来使用。
     }
   }
 

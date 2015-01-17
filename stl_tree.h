@@ -220,44 +220,50 @@ inline _Value* value_type(const _Rb_tree_iterator<_Value, _Ref, _Ptr>&) {
 
 #endif /* __STL_CLASS_PARTIAL_SPECIALIZATION */
 
+//左旋操作：时间复杂度为o(1)
 inline void 
 _Rb_tree_rotate_left(_Rb_tree_node_base* __x, _Rb_tree_node_base*& __root)
 {
   _Rb_tree_node_base* __y = __x->_M_right;
-  __x->_M_right = __y->_M_left;
+  
+  __x->_M_right = __y->_M_left;//第一部分
   if (__y->_M_left !=0)
     __y->_M_left->_M_parent = __x;
-  __y->_M_parent = __x->_M_parent;
-
+  
+  __y->_M_parent = __x->_M_parent;//第二部分
   if (__x == __root)
     __root = __y;
   else if (__x == __x->_M_parent->_M_left)
     __x->_M_parent->_M_left = __y;
   else
     __x->_M_parent->_M_right = __y;
-  __y->_M_left = __x;
+    
+  __y->_M_left = __x;//第三部分
   __x->_M_parent = __y;
 }
-
+//右旋操作：时间复杂度为o(1)
 inline void 
 _Rb_tree_rotate_right(_Rb_tree_node_base* __x, _Rb_tree_node_base*& __root)
 {
   _Rb_tree_node_base* __y = __x->_M_left;
+  
   __x->_M_left = __y->_M_right;
   if (__y->_M_right != 0)
     __y->_M_right->_M_parent = __x;
+    
   __y->_M_parent = __x->_M_parent;
-
   if (__x == __root)
     __root = __y;
   else if (__x == __x->_M_parent->_M_right)
     __x->_M_parent->_M_right = __y;
   else
     __x->_M_parent->_M_left = __y;
+    
   __y->_M_right = __x;
   __x->_M_parent = __y;
 }
 
+//_Rb_tree_rebalance函数的时间复杂度为o(logN)
 inline void 
 _Rb_tree_rebalance(_Rb_tree_node_base* __x, _Rb_tree_node_base*& __root)
 {
@@ -265,23 +271,23 @@ _Rb_tree_rebalance(_Rb_tree_node_base* __x, _Rb_tree_node_base*& __root)
   while (__x != __root && __x->_M_parent->_M_color == _S_rb_tree_red) {
     if (__x->_M_parent == __x->_M_parent->_M_parent->_M_left) {
       _Rb_tree_node_base* __y = __x->_M_parent->_M_parent->_M_right;
-      if (__y && __y->_M_color == _S_rb_tree_red) {
+      if (__y && __y->_M_color == _S_rb_tree_red) {//情况1：叔父节点为红色--将__x节点上调
         __x->_M_parent->_M_color = _S_rb_tree_black;
         __y->_M_color = _S_rb_tree_black;
         __x->_M_parent->_M_parent->_M_color = _S_rb_tree_red;
         __x = __x->_M_parent->_M_parent;
       }
-      else {
-        if (__x == __x->_M_parent->_M_right) {
+      else {//叔父节点为黑色
+        if (__x == __x->_M_parent->_M_right) {//情况2：__x的父亲节点为左孩子但__x为右孩子--转到情况3
           __x = __x->_M_parent;
           _Rb_tree_rotate_left(__x, __root);
         }
-        __x->_M_parent->_M_color = _S_rb_tree_black;
+        __x->_M_parent->_M_color = _S_rb_tree_black;//情况3：__x和__x的父亲节点均为左孩子
         __x->_M_parent->_M_parent->_M_color = _S_rb_tree_red;
         _Rb_tree_rotate_right(__x->_M_parent->_M_parent, __root);
       }
     }
-    else {
+    else {//与上面的情况完全对称
       _Rb_tree_node_base* __y = __x->_M_parent->_M_parent->_M_left;
       if (__y && __y->_M_color == _S_rb_tree_red) {
         __x->_M_parent->_M_color = _S_rb_tree_black;
@@ -300,7 +306,7 @@ _Rb_tree_rebalance(_Rb_tree_node_base* __x, _Rb_tree_node_base*& __root)
       }
     }
   }
-  __root->_M_color = _S_rb_tree_black;
+  __root->_M_color = _S_rb_tree_black;//对根节点的颜色进行设置
 }
 
 inline _Rb_tree_node_base*

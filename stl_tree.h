@@ -688,6 +688,8 @@ public:
   operator=(const _Rb_tree<_Key,_Value,_KeyOfValue,_Compare,_Alloc>& __x);
 
 private:
+//辅助函数
+//_M_root和_M_header互为父节点，这是一种实现技巧
   void _M_empty_initialize() {
     _S_color(_M_header) = _S_rb_tree_red; // used to distinguish header from 
                                           // __root, in iterator.operator++

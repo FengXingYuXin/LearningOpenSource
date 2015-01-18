@@ -278,7 +278,7 @@ _Rb_tree_rebalance(_Rb_tree_node_base* __x, _Rb_tree_node_base*& __root)
         __x = __x->_M_parent->_M_parent;
       }
       else {//叔父节点为黑色
-        if (__x == __x->_M_parent->_M_right) {//情况2：__x的父亲节点为左孩子但__x为右孩子--转到情况3
+        if (__x == __x->_M_parent->_M_right) {//情况2：__x的父亲节点为左孩子但__x为右孩子--左旋后转到情况3
           __x = __x->_M_parent;
           _Rb_tree_rotate_left(__x, __root);
         }
@@ -318,18 +318,18 @@ _Rb_tree_rebalance_for_erase(_Rb_tree_node_base* __z,
   _Rb_tree_node_base* __y = __z;
   _Rb_tree_node_base* __x = 0;
   _Rb_tree_node_base* __x_parent = 0;
-  if (__y->_M_left == 0)     // __z has at most one non-null child. y == z.
+  if (__y->_M_left == 0)     // __z has at most one non-null child. y == z.情况A
     __x = __y->_M_right;     // __x might be null.
   else
-    if (__y->_M_right == 0)  // __z has exactly one non-null child. y == z.
+    if (__y->_M_right == 0)  // __z has exactly one non-null child. y == z.情况B
       __x = __y->_M_left;    // __x is not null.
-    else {                   // __z has two non-null children.  Set __y to
+    else {                   // __z has two non-null children.  Set __y to 情况C
       __y = __y->_M_right;   //   __z's successor.  __x might be null.
       while (__y->_M_left != 0)
         __y = __y->_M_left;
       __x = __y->_M_right;
     }
-  if (__y != __z) {          // relink y in place of z.  y is z's successor
+  if (__y != __z) {          // relink y in place of z.  y is z's successor，针对情况C
     __z->_M_left->_M_parent = __y; 
     __y->_M_left = __z->_M_left;
     if (__y != __z->_M_right) {
@@ -354,7 +354,8 @@ _Rb_tree_rebalance_for_erase(_Rb_tree_node_base* __z,
   }
   else {                        // __y == __z
     __x_parent = __y->_M_parent;
-    if (__x) __x->_M_parent = __y->_M_parent;   
+    
+    if (__x) __x->_M_parent = __y->_M_parent; //将__x与__z->_M_parent连接起来  
     if (__root == __z)
       __root = __x;
     else 
@@ -362,13 +363,15 @@ _Rb_tree_rebalance_for_erase(_Rb_tree_node_base* __z,
         __z->_M_parent->_M_left = __x;
       else
         __z->_M_parent->_M_right = __x;
-    if (__leftmost == __z) 
+        
+    if (__leftmost == __z) //重新设置__leftmost
       if (__z->_M_right == 0)        // __z->_M_left must be null also
         __leftmost = __z->_M_parent;
     // makes __leftmost == _M_header if __z == __root
       else
         __leftmost = _Rb_tree_node_base::_S_minimum(__x);
-    if (__rightmost == __z)  
+        
+    if (__rightmost == __z)//重新设置__rightmost 
       if (__z->_M_left == 0)         // __z->_M_right must be null also
         __rightmost = __z->_M_parent;  
     // makes __rightmost == _M_header if __z == __root
@@ -599,7 +602,7 @@ protected:
     { return (_Link_type&) _M_header->_M_right; }
 
   static _Link_type& _S_left(_Link_type __x)
-    { return (_Link_type&)(__x->_M_left); }
+     { return (_Link_type&)(__x->_M_left); }
   static _Link_type& _S_right(_Link_type __x)
     { return (_Link_type&)(__x->_M_right); }
   static _Link_type& _S_parent(_Link_type __x)

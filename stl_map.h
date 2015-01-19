@@ -51,7 +51,7 @@ inline bool operator==(const map<_Key,_Tp,_Compare,_Alloc>& __x,
 template <class _Key, class _Tp, class _Compare, class _Alloc>
 inline bool operator<(const map<_Key,_Tp,_Compare,_Alloc>& __x, 
                       const map<_Key,_Tp,_Compare,_Alloc>& __y);
-
+//map容器底层通过_Rb_tree实现
 template <class _Key, class _Tp, class _Compare, class _Alloc>
 class map {
 public:
@@ -61,9 +61,10 @@ public:
   typedef _Key                  key_type;
   typedef _Tp                   data_type;
   typedef _Tp                   mapped_type;
-  typedef pair<const _Key, _Tp> value_type;
+  typedef pair<const _Key, _Tp> value_type;//跟其它的容器不太一样
   typedef _Compare              key_compare;
-    
+  
+  //内嵌的仿函数类  
   class value_compare
     : public binary_function<value_type, value_type, bool> {
   friend class map<_Key,_Tp,_Compare,_Alloc>;

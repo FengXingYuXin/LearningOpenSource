@@ -52,6 +52,7 @@ template <class _Key, class _Compare, class _Alloc>
 inline bool operator<(const multiset<_Key,_Compare,_Alloc>& __x, 
                       const multiset<_Key,_Compare,_Alloc>& __y);
 
+//multiset是通过_Rb_tree实现，接口操作通过调用_equal版本来实现
 template <class _Key, class _Compare, class _Alloc>
 class multiset {
 public:

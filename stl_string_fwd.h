@@ -18,13 +18,14 @@
 #include <stl_alloc.h>
 
 __STL_BEGIN_NAMESPACE
-
+//模板的前向声明
 template <class _CharT> struct char_traits;
 template <class _CharT, 
           class _Traits = char_traits<_CharT>, 
           class _Alloc = __STL_DEFAULT_ALLOCATOR(_CharT) >
 class basic_string;
 
+//型别变量
 typedef basic_string<char>    string;
 typedef basic_string<wchar_t> wstring;
 

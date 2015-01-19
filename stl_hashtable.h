@@ -47,7 +47,7 @@
 __STL_BEGIN_NAMESPACE
 
 template <class _Val>
-struct _Hashtable_node
+struct _Hashtable_node//separate chaining技巧
 {
   _Hashtable_node* _M_next;
   _Val _M_val;
@@ -57,6 +57,7 @@ template <class _Val, class _Key, class _HashFcn,
           class _ExtractKey, class _EqualKey, class _Alloc = alloc>
 class hashtable;
 
+//_Hashtable_iterator和_Hashtable_const_iterator会相互使用；
 template <class _Val, class _Key, class _HashFcn,
           class _ExtractKey, class _EqualKey, class _Alloc>
 struct _Hashtable_iterator;
@@ -85,6 +86,7 @@ struct _Hashtable_iterator {
   typedef _Val& reference;
   typedef _Val* pointer;
 
+//数据成员
   _Node* _M_cur;
   _Hashtable* _M_ht;
 
@@ -124,6 +126,7 @@ struct _Hashtable_const_iterator {
   typedef const _Val& reference;
   typedef const _Val* pointer;
 
+//数据成员
   const _Node* _M_cur;
   const _Hashtable* _M_ht;
 
@@ -144,6 +147,7 @@ struct _Hashtable_const_iterator {
     { return _M_cur != __it._M_cur; }
 };
 
+//表长的实现方式；
 // Note: assumes long is at least 32 bits.
 enum { __stl_num_primes = 28 };
 
@@ -156,7 +160,7 @@ static const unsigned long __stl_prime_list[__stl_num_primes] =
   50331653ul,   100663319ul,  201326611ul, 402653189ul, 805306457ul, 
   1610612741ul, 3221225473ul, 4294967291ul
 };
-
+//找出最接近__n并且大于__n的质数；
 inline unsigned long __stl_next_prime(unsigned long __n)
 {
   const unsigned long* __first = __stl_prime_list;
@@ -189,8 +193,8 @@ class hashtable {
 public:
   typedef _Key key_type;
   typedef _Val value_type;
-  typedef _HashFcn hasher;
-  typedef _EqualKey key_equal;
+  typedef _HashFcn hasher;//从节点中取出键值的方法（函数或仿函数）；
+  typedef _EqualKey key_equal;//判断键值是否相同的方法（函数或仿函数）；
 
   typedef size_t            size_type;
   typedef ptrdiff_t         difference_type;

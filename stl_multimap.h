@@ -53,6 +53,7 @@ template <class _Key, class _Tp, class _Compare, class _Alloc>
 inline bool operator<(const multimap<_Key,_Tp,_Compare,_Alloc>& __x, 
                       const multimap<_Key,_Tp,_Compare,_Alloc>& __y);
 
+//底层通过_Rb_tree来实现
 template <class _Key, class _Tp, class _Compare, class _Alloc>
 class multimap {
 public:
@@ -62,7 +63,7 @@ public:
   typedef _Key                  key_type;
   typedef _Tp                   data_type;
   typedef _Tp                   mapped_type;
-  typedef pair<const _Key, _Tp> value_type;
+  typedef pair<const _Key, _Tp> value_type;//跟map相同
   typedef _Compare              key_compare;
 
   class value_compare : public binary_function<value_type, value_type, bool> {

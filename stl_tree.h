@@ -125,16 +125,16 @@ struct _Rb_tree_base_iterator
         _M_node = __y;                  //此时满足_M_node==__y->_M_left,则__y节点即为解答；
         __y = __y->_M_parent;
       }
-      if (_M_node->_M_right != __y)//第3种情况：若此时满足_M_node->_M_right==__y,则是在寻找根节点的下一节点，配合
-        _M_node = __y;             //其它结构来使用。
+      if (_M_node->_M_right != __y)//对于红黑树中只有一个根节点的情况，不需要进行_M_node=__y的操作，__header节点为解答；
+        _M_node = __y;      
     }
   }
 
   void _M_decrement()
   {
-    if (_M_node->_M_color == _S_rb_tree_red &&//针对特殊的情况：此时_M_node为header；
+    if (_M_node->_M_color == _S_rb_tree_red &&//针对特殊的情况：只有一个根节点，并且此时_M_node为header；
         _M_node->_M_parent->_M_parent == _M_node)
-      _M_node = _M_node->_M_right;
+      _M_node = _M_node->_M_right;//根节点即为解答
     else if (_M_node->_M_left != 0) {//情况2：当_M_node有左孩子时，左子树的最大值即为解答；
       _Base_ptr __y = _M_node->_M_left;
       while (__y->_M_right != 0)

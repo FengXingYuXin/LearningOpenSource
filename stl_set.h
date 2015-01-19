@@ -52,7 +52,7 @@ template <class _Key, class _Compare, class _Alloc>
 inline bool operator<(const set<_Key,_Compare,_Alloc>& __x, 
                       const set<_Key,_Compare,_Alloc>& __y);
 
-
+//set容器底层是通过_Rb_tree实现，接口操作调用_unique版本来实现
 template <class _Key, class _Compare, class _Alloc>
 class set {
 public:

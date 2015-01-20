@@ -66,6 +66,8 @@ template <class _Val, class _Key, class _HashFcn,
           class _ExtractKey, class _EqualKey, class _Alloc>
 struct _Hashtable_const_iterator;
 
+//哈希表的迭代器封装了_Hashtable_node*与_Hashtable*两个指针；
+//_Hashtable_iterator类
 template <class _Val, class _Key, class _HashFcn,
           class _ExtractKey, class _EqualKey, class _Alloc>
 struct _Hashtable_iterator {
@@ -87,7 +89,7 @@ struct _Hashtable_iterator {
   typedef _Val* pointer;
 
   _Node* _M_cur;//迭代器目前所指的节点
-  _Hashtable* _M_ht;//保持对容器的连接关系，因为可能从一个bucket跳到下一个bucket
+  _Hashtable* _M_ht;//保持容器中_bucket之间的连接与跳转；
 
   _Hashtable_iterator(_Node* __n, _Hashtable* __tab) 
     : _M_cur(__n), _M_ht(__tab) {}
@@ -104,7 +106,7 @@ struct _Hashtable_iterator {
     { return _M_cur != __it._M_cur; }
 };
 
-
+//_Hashtable_const_iterator类
 template <class _Val, class _Key, class _HashFcn,
           class _ExtractKey, class _EqualKey, class _Alloc>
 struct _Hashtable_const_iterator {
@@ -125,7 +127,6 @@ struct _Hashtable_const_iterator {
   typedef const _Val& reference;
   typedef const _Val* pointer;
 
-//数据成员
   const _Node* _M_cur;
   const _Hashtable* _M_ht;
 
@@ -186,10 +187,12 @@ bool operator==(const hashtable<_Val,_Key,_HF,_Ex,_Eq,_All>& __ht1,
 //  Additionally, a base class wouldn't serve any other purposes; it 
 //  wouldn't, for example, simplify the exception-handling code.
 
+//hashtable类
 template <class _Val, class _Key, class _HashFcn,
           class _ExtractKey, class _EqualKey, class _Alloc>
 class hashtable {
 public:
+//类型别名；
   typedef _Key key_type;
   typedef _Val value_type;
   typedef _HashFcn hasher;//从节点中取出键值的方法（函数或仿函数）；
@@ -248,6 +251,7 @@ public:
   _Hashtable_const_iterator<_Val,_Key,_HashFcn,_ExtractKey,_EqualKey,_Alloc>;
 
 public:
+//构造函数；
   hashtable(size_type __n,
             const _HashFcn&    __hf,
             const _EqualKey&   __eql,
@@ -289,7 +293,7 @@ public:
   }
 
 #undef __HASH_ALLOC_INIT
-
+//赋值操作符；
   hashtable& operator= (const hashtable& __ht)
   {
     if (&__ht != this) {
@@ -303,7 +307,7 @@ public:
   }
 
   ~hashtable() { clear(); }
-
+//容器操作
   size_type size() const { return _M_num_elements; }
   size_type max_size() const { return size_type(-1); }
   bool empty() const { return size() == 0; }//return _M__num_elements==0;

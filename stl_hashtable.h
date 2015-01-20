@@ -86,9 +86,8 @@ struct _Hashtable_iterator {
   typedef _Val& reference;
   typedef _Val* pointer;
 
-//数据成员
-  _Node* _M_cur;
-  _Hashtable* _M_ht;
+  _Node* _M_cur;//迭代器目前所指的节点
+  _Hashtable* _M_ht;//保持对容器的连接关系，因为可能从一个bucket跳到下一个bucket
 
   _Hashtable_iterator(_Node* __n, _Hashtable* __tab) 
     : _M_cur(__n), _M_ht(__tab) {}
@@ -307,7 +306,7 @@ public:
 
   size_type size() const { return _M_num_elements; }
   size_type max_size() const { return size_type(-1); }
-  bool empty() const { return size() == 0; }
+  bool empty() const { return size() == 0; }//return _M__num_elements==0;
 
   void swap(hashtable& __ht)
   {
@@ -354,6 +353,7 @@ public:
   size_type max_bucket_count() const
     { return __stl_prime_list[(int)__stl_num_primes - 1]; } 
 
+//求解具有相同位置的元素；
   size_type elems_in_bucket(size_type __bucket) const
   {
     size_type __result = 0;

@@ -47,7 +47,7 @@ inline size_t __stl_hash_string(const char* __s)
   
   return size_t(__h);
 }
-
+//模板特化
 __STL_TEMPLATE_NULL struct hash<char*>
 {
   size_t operator()(const char* __s) const { return __stl_hash_string(__s); }

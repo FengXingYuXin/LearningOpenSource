@@ -51,6 +51,7 @@ inline bool
 operator==(const hash_set<_Value,_HashFcn,_EqualKey,_Alloc>& __hs1,
            const hash_set<_Value,_HashFcn,_EqualKey,_Alloc>& __hs2);
 
+//底层通过hashtable实现
 template <class _Value, class _HashFcn, class _EqualKey, class _Alloc>
 class hash_set
 {
@@ -60,6 +61,7 @@ private:
   _Ht _M_ht;
 
 public:
+//类型别名；
   typedef typename _Ht::key_type key_type;
   typedef typename _Ht::value_type value_type;
   typedef typename _Ht::hasher hasher;
@@ -82,6 +84,7 @@ public:
   allocator_type get_allocator() const { return _M_ht.get_allocator(); }
 
 public:
+//构造函数；
   hash_set()
     : _M_ht(100, hasher(), key_equal(), allocator_type()) {}
   explicit hash_set(size_type __n)
@@ -248,7 +251,7 @@ inline bool
 operator==(const hash_multiset<_Val,_HashFcn,_EqualKey,_Alloc>& __hs1,
            const hash_multiset<_Val,_HashFcn,_EqualKey,_Alloc>& __hs2);
 
-
+//底层通过hashtable实现,equal版本的操作；
 template <class _Value, class _HashFcn, class _EqualKey, class _Alloc>
 class hash_multiset
 {
@@ -430,7 +433,7 @@ swap(hash_multiset<_Val,_HashFcn,_EqualKey,_Alloc>& __hs1,
 // and hash_multiset.
 
 #ifdef __STL_CLASS_PARTIAL_SPECIALIZATION
-
+//insert_iterator类；
 template <class _Value, class _HashFcn, class _EqualKey, class _Alloc>
 class insert_iterator<hash_set<_Value, _HashFcn, _EqualKey, _Alloc> > {
 protected:

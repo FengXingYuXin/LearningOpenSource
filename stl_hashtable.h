@@ -46,8 +46,10 @@
 
 __STL_BEGIN_NAMESPACE
 
+//separate chaining的方法解决冲突；
+//每一个_bucket里均有一个chaining;
 template <class _Val>
-struct _Hashtable_node//separate chaining技巧
+struct _Hashtable_node
 {
   _Hashtable_node* _M_next;
   _Val _M_val;
@@ -728,8 +730,10 @@ hashtable<_Val,_Key,_HF,_Ex,_Eq,_All>
       return pair<iterator, bool>(iterator(__cur, this), false);
 
   _Node* __tmp = _M_new_node(__obj);
+  
   __tmp->_M_next = __first;
   _M_buckets[__n] = __tmp;
+  
   ++_M_num_elements;
   return pair<iterator, bool>(iterator(__tmp, this), true);
 }
@@ -745,15 +749,19 @@ hashtable<_Val,_Key,_HF,_Ex,_Eq,_All>
   for (_Node* __cur = __first; __cur; __cur = __cur->_M_next) 
     if (_M_equals(_M_get_key(__cur->_M_val), _M_get_key(__obj))) {
       _Node* __tmp = _M_new_node(__obj);
+      
       __tmp->_M_next = __cur->_M_next;
       __cur->_M_next = __tmp;
+      
       ++_M_num_elements;
       return iterator(__tmp, this);
     }
 
   _Node* __tmp = _M_new_node(__obj);
+  
   __tmp->_M_next = __first;
   _M_buckets[__n] = __tmp;
+  
   ++_M_num_elements;
   return iterator(__tmp, this);
 }
@@ -766,11 +774,11 @@ hashtable<_Val,_Key,_HF,_Ex,_Eq,_All>::find_or_insert(const value_type& __obj)
 
   size_type __n = _M_bkt_num(__obj);
   _Node* __first = _M_buckets[__n];
-
+//find部分；
   for (_Node* __cur = __first; __cur; __cur = __cur->_M_next)
     if (_M_equals(_M_get_key(__cur->_M_val), _M_get_key(__obj)))
       return __cur->_M_val;
-
+//insert部分；
   _Node* __tmp = _M_new_node(__obj);
   __tmp->_M_next = __first;
   _M_buckets[__n] = __tmp;

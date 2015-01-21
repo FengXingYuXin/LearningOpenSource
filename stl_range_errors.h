@@ -48,6 +48,10 @@ __STL_END_NAMESPACE
 #include <stdexcept>
 
 __STL_BEGIN_NAMESPACE
+
+//__stl_throw_range_error;
+//__stl_throw_length_error;
+
 inline void __stl_throw_range_error(const char* __msg) 
   { throw range_error(__msg); }
 inline void __stl_throw_length_error(const char* __msg)

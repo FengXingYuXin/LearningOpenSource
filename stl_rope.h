@@ -1,3 +1,5 @@
+//多数字符串都是连续存储的，但是rope打破了这个界限，而是各个片段离散存放在内存中；
+
 /*
  * Copyright (c) 1997-1998
  * Silicon Graphics Computer Systems, Inc.
@@ -97,6 +99,7 @@ class char_producer {
 // behave a little like basic_ostringstream<sequence::value_type> and a
 // little like containers.
 
+//sequence_buffer类
 template<class _Sequence, size_t _Buf_sz = 100
 #   if defined(__sgi) && !defined(__GNUC__)
 #        define __TYPEDEF_WORKAROUND
@@ -121,6 +124,7 @@ class sequence_buffer : public output_iterator {
             _M_buf_count = 0;
         }
         ~sequence_buffer() { flush(); }
+        
         sequence_buffer() : _M_prefix(0), _M_buf_count(0) {}
         sequence_buffer(const sequence_buffer& __x) {
             _M_prefix = __x._M_prefix;
@@ -299,6 +303,7 @@ rope<_CharT,_Alloc> operator+ (const rope<_CharT,_Alloc>& __left,
 
 // This uses a nonstandard refcount convention.
 // The result has refcount 0.
+//二元仿函数contacting_rope_class;
 template<class _CharT, class _Alloc>
 struct _Rope_Concat_fn
        : public binary_function<rope<_CharT,_Alloc>, rope<_CharT,_Alloc>,
@@ -309,6 +314,7 @@ struct _Rope_Concat_fn
         }
 };
 
+//contacting的证同元素
 template <class _CharT, class _Alloc>
 inline
 rope<_CharT,_Alloc>
@@ -554,6 +560,7 @@ struct _Rope_RopeRep : public _Rope_rep_base<_CharT,_Alloc>
 
 };
 
+//_Rope_RopeLeaf类
 template<class _CharT, class _Alloc>
 struct _Rope_RopeLeaf : public _Rope_RopeRep<_CharT,_Alloc> {
   public:
@@ -608,6 +615,7 @@ struct _Rope_RopeLeaf : public _Rope_RopeRep<_CharT,_Alloc> {
 # endif
 };
 
+//_Rope_RopeContatenation类
 template<class _CharT, class _Alloc>
 struct _Rope_RopeConcatenation : public _Rope_RopeRep<_CharT,_Alloc> {
   public:
@@ -631,7 +639,7 @@ struct _Rope_RopeConcatenation : public _Rope_RopeRep<_CharT,_Alloc> {
     }
 # endif
 };
-
+//_Rope_RopeFunction类
 template<class _CharT, class _Alloc>
 struct _Rope_RopeFunction : public _Rope_RopeRep<_CharT,_Alloc> {
   public:
@@ -684,6 +692,8 @@ struct _Rope_RopeFunction : public _Rope_RopeRep<_CharT,_Alloc> {
 // RopeFunction, whose char_producer points back to the rope itself.
 // In all cases except repeated substring operations and
 // deallocation, we treat the __result as a RopeFunction.
+
+//_Rope_RopeSubstring类
 template<class _CharT, class _Alloc>
 struct _Rope_RopeSubstring : public _Rope_RopeFunction<_CharT,_Alloc>,
                              public char_producer<_CharT> {
@@ -775,6 +785,8 @@ struct _Rope_RopeSubstring : public _Rope_RopeFunction<_CharT,_Alloc>,
 // return an actual reference since assignment requires extra
 // work.  And we would get into the same problems as with the
 // CD2 version of basic_string.
+
+//_Rope_char_ref_proxy类
 template<class _CharT, class _Alloc>
 class _Rope_char_ref_proxy {
     friend class rope<_CharT,_Alloc>;
@@ -838,6 +850,7 @@ _ROPE_SWAP_SPECIALIZATION(char,__STL_DEFAULT_ALLOCATOR(char))
 
 #endif /* !__STL_FUNCTION_TMPL_PARTIAL_ORDER */
 
+//_Rope_char_ptr_proxy类
 template<class _CharT, class _Alloc>
 class _Rope_char_ptr_proxy {
     // XXX this class should be rewritten.
@@ -958,6 +971,7 @@ class _Rope_iterator_base
 
 template<class _CharT, class _Alloc> class _Rope_iterator;
 
+//random_access_iterator类型的迭代器；
 template<class _CharT, class _Alloc>
 class _Rope_const_iterator : public _Rope_iterator_base<_CharT,_Alloc> {
     friend class rope<_CharT,_Alloc>;
@@ -966,6 +980,7 @@ class _Rope_const_iterator : public _Rope_iterator_base<_CharT,_Alloc> {
       typedef _Rope_RopeRep<_CharT,_Alloc> _RopeRep;
       // The one from the base class may not be directly visible.
 #   endif
+
     _Rope_const_iterator(const _RopeRep* __root, size_t __pos):
                    _Rope_iterator_base<_CharT,_Alloc>(
                      const_cast<_RopeRep*>(__root), __pos)
@@ -978,12 +993,14 @@ class _Rope_const_iterator : public _Rope_iterator_base<_CharT,_Alloc> {
     typedef const _CharT* pointer;
 
   public:
+  //构造函数
     _Rope_const_iterator() {};
     _Rope_const_iterator(const _Rope_const_iterator& __x) :
                                 _Rope_iterator_base<_CharT,_Alloc>(__x) { }
     _Rope_const_iterator(const _Rope_iterator<_CharT,_Alloc>& __x);
     _Rope_const_iterator(const rope<_CharT,_Alloc>& __r, size_t __pos) :
         _Rope_iterator_base<_CharT,_Alloc>(__r._M_tree_ptr, __pos) {}
+        
     _Rope_const_iterator& operator= (const _Rope_const_iterator& __x) {
         if (0 != __x._M_buf_ptr) {
             *(static_cast<_Rope_iterator_base<_CharT,_Alloc>*>(this)) = __x;
@@ -1096,6 +1113,7 @@ class _Rope_const_iterator : public _Rope_iterator_base<_CharT,_Alloc> {
 #endif
 };
 
+//_Rope_iterator类
 template<class _CharT, class _Alloc>
 class _Rope_iterator : public _Rope_iterator_base<_CharT,_Alloc> {
     friend class rope<_CharT,_Alloc>;
@@ -1355,7 +1373,7 @@ protected:
 
 #endif /* __STL_USE_STD_ALLOCATORS */
 
-
+//rope类
 template <class _CharT, class _Alloc>
 class rope : public _Rope_base<_CharT,_Alloc> {
     public:
@@ -1658,7 +1676,7 @@ class rope : public _Rope_base<_CharT,_Alloc> {
         int compare(const rope& __y) const {
             return _S_compare(_M_tree_ptr, __y._M_tree_ptr);
         }
-
+//构造函数
         rope(const _CharT* __s, const allocator_type& __a = allocator_type())
         : _Base(__STL_ROPE_FROM_UNOWNED_CHAR_PTR(__s, _S_char_ptr_len(__s),
                                                  __a),__a)

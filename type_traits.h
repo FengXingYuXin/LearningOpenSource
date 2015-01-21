@@ -77,7 +77,7 @@ struct __type_traits {
           - Members you add will be treated like regular members unless
             you add the appropriate support in the compiler. */
  
-
+//此处，typedef使同一种类型用在不同的具体情形下，封装了具体的类型信息；
    typedef __false_type    has_trivial_default_constructor;
    typedef __false_type    has_trivial_copy_constructor;
    typedef __false_type    has_trivial_assignment_operator;
@@ -93,6 +93,7 @@ struct __type_traits {
 
 #ifndef __STL_NO_BOOL
 
+//模板特化技术
 __STL_TEMPLATE_NULL struct __type_traits<bool> {
    typedef __true_type    has_trivial_default_constructor;
    typedef __true_type    has_trivial_copy_constructor;
@@ -303,6 +304,9 @@ template <class _Tp> struct _Is_integer {
 };
 
 #ifndef __STL_NO_BOOL
+
+//bool,char,signed char,unsigned char,wchar_t,shot,unsigned shot,int,unsigned int,
+//long,unsigned long,long long,unsigned long long均为integer类型；
 
 __STL_TEMPLATE_NULL struct _Is_integer<bool> {
   typedef __true_type _Integral;

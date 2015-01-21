@@ -60,6 +60,7 @@ struct _Refcount_Base
   typedef size_t _RC_t;
 #endif
   
+  //volatile类型修饰符表示编译器不会因为优化而省掉相应的语句；
   // The data member _M_ref_count
    volatile _RC_t _M_ref_count;
 

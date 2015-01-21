@@ -1,3 +1,6 @@
+//valarray的定义稍显赘余，繁琐；
+//个人觉得里面很多相关操作都是很少用到的，所以没有必要定义，只需要重载一些基本的操作符即可；
+
 /*
  * Copyright (c) 1999
  * Silicon Graphics Computer Systems, Inc.
@@ -24,6 +27,7 @@
 
 __STL_BEGIN_NAMESPACE
 
+//前向声明；
 class slice;
 class gslice;
 

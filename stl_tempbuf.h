@@ -45,7 +45,7 @@ __get_temporary_buffer(ptrdiff_t __len, _Tp*)
     _Tp* __tmp = (_Tp*) malloc((size_t)__len * sizeof(_Tp));
     if (__tmp != 0)
       return pair<_Tp*, ptrdiff_t>(__tmp, __len);
-    __len /= 2;
+    __len /= 2;//当内存大小不够的时候，所采取的策略；
   }
 
   return pair<_Tp*, ptrdiff_t>((_Tp*)0, 0);
@@ -75,11 +75,12 @@ void return_temporary_buffer(_Tp* __p) {
   free(__p);
 }
 
+//_Temporary_buffer类
 template <class _ForwardIterator, class _Tp>
 class _Temporary_buffer {
 private:
-  ptrdiff_t  _M_original_len;
-  ptrdiff_t  _M_len;
+  ptrdiff_t  _M_original_len;//要求的大小；
+  ptrdiff_t  _M_len;//实际大小；
   _Tp*       _M_buffer;
 
   void _M_allocate_buffer() {

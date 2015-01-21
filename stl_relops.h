@@ -33,6 +33,7 @@
 
 __STL_BEGIN_RELOPS_NAMESPACE
 
+//重载操作符：!=,>,<=,>=;
 template <class _Tp>
 inline bool operator!=(const _Tp& __x, const _Tp& __y) {
   return !(__x == __y);

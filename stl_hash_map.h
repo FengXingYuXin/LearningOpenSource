@@ -51,6 +51,7 @@ template <class _Key, class _Tp, class _HashFn, class _EqKey, class _Alloc>
 inline bool operator==(const hash_map<_Key, _Tp, _HashFn, _EqKey, _Alloc>&,
                        const hash_map<_Key, _Tp, _HashFn, _EqKey, _Alloc>&);
 
+//hash_map底层通过hashtable实现
 template <class _Key, class _Tp, class _HashFcn, class _EqualKey,
           class _Alloc>
 class hash_map
@@ -255,6 +256,8 @@ inline bool
 operator==(const hash_multimap<_Key,_Tp,_HF,_EqKey,_Alloc>& __hm1,
            const hash_multimap<_Key,_Tp,_HF,_EqKey,_Alloc>& __hm2);
 
+//底层通过hashtable实现；
+//hash_multimap类；
 template <class _Key, class _Tp, class _HashFcn, class _EqualKey, 
           class _Alloc>
 class hash_multimap
@@ -447,7 +450,7 @@ swap(hash_multimap<_Key,_Tp,_HashFcn,_EqlKey,_Alloc>& __hm1,
 // and hash_multimap.
 
 #ifdef __STL_CLASS_PARTIAL_SPECIALIZATION
-
+//insert_iterator类；
 template <class _Key, class _Tp, class _HashFn,  class _EqKey, class _Alloc>
 class insert_iterator<hash_map<_Key, _Tp, _HashFn, _EqKey, _Alloc> > {
 protected:

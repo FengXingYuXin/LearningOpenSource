@@ -129,7 +129,7 @@ inline _OutputIter __copy(_InputIter __first, _InputIter __last,
                           _OutputIter __result,
                           input_iterator_tag, _Distance*)
 {
-  for ( ; __first != __last; ++__result, ++__first)
+  for ( ; __first != __last; ++__result, ++__first)//以迭代器是否相等来决定是否结束，速度稍慢；
     *__result = *__first;
   return __result;
 }
@@ -139,7 +139,7 @@ inline _OutputIter
 __copy(_RandomAccessIter __first, _RandomAccessIter __last,
        _OutputIter __result, random_access_iterator_tag, _Distance*)
 {
-  for (_Distance __n = __last - __first; __n > 0; --__n) {
+  for (_Distance __n = __last - __first; __n > 0; --__n) {//以__n是否为0来决定是否结束，速度很快；
     *__result = *__first;
     ++__first;
     ++__result;
@@ -147,6 +147,7 @@ __copy(_RandomAccessIter __first, _RandomAccessIter __last,
   return __result;
 }
 
+//对于POD类型的数据，转调memmove函数，速度极快；
 template <class _Tp>
 inline _Tp*
 __copy_trivial(const _Tp* __first, const _Tp* __last, _Tp* __result) {
@@ -281,6 +282,32 @@ __SGI_STL_DECLARE_COPY_TRIVIAL(long double)
 #undef __SGI_STL_DECLARE_COPY_TRIVIAL
 #endif /* __STL_CLASS_PARTIAL_SPECIALIZATION */
 
+
+//memmove函数；
+void* memmove(void* dest,void* src,size_t count)
+{
+  ASSERT(dest!=0||src!=0);
+  if(dest<=src||src+count<dest){
+    while(count--)
+       *dest++=*src++;
+  }
+  else{
+    dest+=count-1;
+    src+=count-1;
+    while(count--)
+      *dest--=*src--;
+  }
+  return dest;
+}
+//memcpy函数；
+void* memcpy(void* dest,void*src,size_t count)
+{
+  ASSERT(dest!=0||src!=0);
+  ASSERT(src<dest&&dest<src+count);
+  while(count--)
+     *dest++=*src++;
+  return dest;
+}
 //--------------------------------------------------
 // copy_backward
 

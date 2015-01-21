@@ -34,6 +34,8 @@
 
 #ifdef __STL_USE_NAMESPACES
 
+//总共60几个算法；
+
 // Names from <stl_algo.h>
 using __STD::for_each; 
 using __STD::find; 

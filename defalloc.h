@@ -79,6 +79,7 @@ public:
     }
 };
 
+template<>
 class allocator<void> {
 public:
     typedef void* pointer;

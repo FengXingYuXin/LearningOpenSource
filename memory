@@ -28,29 +28,33 @@ __STL_BEGIN_NAMESPACE
 
 #if defined(__SGI_STL_USE_AUTO_PTR_CONVERSIONS) && \
     defined(__STL_MEMBER_TEMPLATES)
-
-template<class _Tp1> struct auto_ptr_ref {
+//auto_ptr conbersions;
+template<class _Tp1> 
+struct auto_ptr_ref {
   _Tp1* _M_ptr;
   auto_ptr_ref(_Tp1* __p) : _M_ptr(__p) {}
 };
 
 #endif
-
-template <class _Tp> class auto_ptr {
+//auto_ptr类的定义如下：
+template <class _Tp> 
+class auto_ptr {
 private:
-  _Tp* _M_ptr;
+  _Tp* _M_ptr;//真实的变量指针；
 
 public:
   typedef _Tp element_type;
 
   explicit auto_ptr(_Tp* __p = 0) __STL_NOTHROW : _M_ptr(__p) {}
+  
+  //拷贝构造函数
   auto_ptr(auto_ptr& __a) __STL_NOTHROW : _M_ptr(__a.release()) {}
-
 #ifdef __STL_MEMBER_TEMPLATES
   template <class _Tp1> auto_ptr(auto_ptr<_Tp1>& __a) __STL_NOTHROW
     : _M_ptr(__a.release()) {}
 #endif /* __STL_MEMBER_TEMPLATES */
 
+//赋值操作符
   auto_ptr& operator=(auto_ptr& __a) __STL_NOTHROW {
     if (&__a != this) {
       delete _M_ptr;
@@ -58,7 +62,6 @@ public:
     }
     return *this;
   }
-
 #ifdef __STL_MEMBER_TEMPLATES
   template <class _Tp1>
   auto_ptr& operator=(auto_ptr<_Tp1>& __a) __STL_NOTHROW {
@@ -72,12 +75,14 @@ public:
 
   ~auto_ptr() __STL_NOTHROW { delete _M_ptr; }
 
+//操作符重载：*,->;
   _Tp& operator*() const __STL_NOTHROW {
     return *_M_ptr;
   }
   _Tp* operator->() const __STL_NOTHROW {
     return _M_ptr;
   }
+  //接口成员函数
   _Tp* get() const __STL_NOTHROW {
     return _M_ptr;
   }
@@ -104,7 +109,6 @@ public:
 public:
   auto_ptr(auto_ptr_ref<_Tp> __ref) __STL_NOTHROW
     : _M_ptr(__ref._M_ptr) {}
-
   auto_ptr& operator=(auto_ptr_ref<_Tp> __ref) __STL_NOTHROW {
     if (__ref._M_ptr != this->get()) {
       delete _M_ptr;
@@ -112,12 +116,13 @@ public:
     }
     return *this;
   }
-
+  
+//auto_ptr<_Tp1>到auto_ptr_ref<_Tp1>类型的转换；
   template <class _Tp1> operator auto_ptr_ref<_Tp1>() __STL_NOTHROW 
     { return auto_ptr_ref<_Tp1>(this->release()); }
+//auto_ptr_ref<_Tp1>到auto_ptr<_Tp1>类型的转换；
   template <class _Tp1> operator auto_ptr<_Tp1>() __STL_NOTHROW
     { return auto_ptr<_Tp1>(this->release()); }
-
 #endif /* auto ptr conversions && member templates */
 };
 

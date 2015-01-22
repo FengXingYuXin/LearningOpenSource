@@ -1,4 +1,5 @@
-//对于特定具体的类型,使用泛型特化的方法求解其数值极限
+//模板特化技巧
+//通过宏定义，来处理static const 类型的变量的定义；
 /*
  * Copyright (c) 1997
  * Silicon Graphics Computer Systems, Inc.
@@ -64,7 +65,7 @@ enum float_denorm_style {
 #endif /* __STL_STATIC_CONST_INIT_BUG */
 
 // Base class for all specializations of numeric_limits.
-
+//_Numeric_limits_base类
 template <class __number>
 class _Numeric_limits_base {
 public:
@@ -147,7 +148,7 @@ __STL_DEFINE_NUMERIC_BASE_MEMBER(float_round_style, round_style);
 
 
 // Base class for integers.
-
+//_Integer_limits类；
 template <class _Int,
           _Int __imin,
           _Int __imax,
@@ -197,6 +198,7 @@ __STL_DEFINE_INTEGER_LIMITS_MEMBER(bool, is_modulo);
 
 
 // Base class for floating-point numbers.
+//_Floating_limits类；
 template <class __number,
          int __Digits, int __Digits10,
          int __MinExp, int __MaxExp,
@@ -296,14 +298,15 @@ __STL_DEFINE_FLOAT_LIMITS_MEMBER(float_round_style, round_style);
 // Class numeric_limits
 
 // The unspecialized class.
-
+//numeric_limits类；
 template<class T> 
 class numeric_limits : public _Numeric_limits_base<T> {};
 
 // Specializations for all built-in integral types.
 
 #ifndef __STL_NO_BOOL
-
+//模板特化技术，针对bool,char,unsigned char,wchar_t,short,unsigned 
+//short,int,unsigned int,long,unsigned long,long long,unsigned long long;
 __STL_TEMPLATE_NULL
 class numeric_limits<bool>
   : public _Integer_limits<bool, false, true, 0>
@@ -392,7 +395,7 @@ class numeric_limits<unsigned long long>
 #endif /* __STL_LONG_LONG */
 
 // Specializations for all built-in floating-point type.
-
+//numeric_limits<float>类；
 __STL_TEMPLATE_NULL class numeric_limits<float>
   : public _Floating_limits<float, 
                             FLT_MANT_DIG,   // Binary digits of precision
@@ -414,7 +417,7 @@ public:
   static float epsilon() __STL_NOTHROW { return FLT_EPSILON; }
   static float round_error() __STL_NOTHROW { return 0.5f; } // Units: ulps.
 };
-
+//numeric_limits<double>类；
 __STL_TEMPLATE_NULL class numeric_limits<double>
   : public _Floating_limits<double, 
                             DBL_MANT_DIG,   // Binary digits of precision

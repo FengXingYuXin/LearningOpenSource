@@ -57,6 +57,22 @@ inline const _Tp& __median(const _Tp& __a, const _Tp& __b, const _Tp& __c) {
   else
     return __b;
 }
+template<class _Tp>
+inline const _Tp& __median(const _Tp& __a,const _Tp& __b,const _Tp& __c)//个人添加；
+{
+	if(__a<__b)
+	   return __b<__c?__b:(__a<__c?__c:__a);
+	else
+	   return __a<__c?__a:(__b<__c?__c:__b);
+}
+template<class _Tp>
+inline const _Tp& __median(const _Tp& __a,const _Tp& __b,const _Tp& __c,_Compare __comp)//个人添加；
+{
+	if(__comp(__a,__b))
+	     return __comp(__b,__c)?__b:(__comp(__a,__c)?__c:__a);
+	else
+	     return __comp(__a,__c)?__a:(__comp(__b,__c)?__c:__b);
+}
 
 template <class _Tp, class _Compare>
 inline const _Tp&
@@ -77,6 +93,7 @@ __median(const _Tp& __a, const _Tp& __b, const _Tp& __c, _Compare __comp) {
 }
 
 // for_each.  Apply a function to every element of a range.
+//for_each函数中，仿函数__f不能修改相应的值，因为迭代器类型是_InputIter类型；
 template <class _InputIter, class _Function>
 _Function for_each(_InputIter __first, _InputIter __last, _Function __f) {
   for ( ; __first != __last; ++__first)

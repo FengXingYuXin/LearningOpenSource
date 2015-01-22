@@ -30,6 +30,7 @@
 #ifndef __SGI_STL_FUNCTION_H
 #include <function.h>
 #endif
+
 #include <stddef.h>
 
 #ifdef __STL_USE_NEW_IOSTREAMS 
@@ -41,15 +42,19 @@
 #ifndef __SGI_STL_INTERNAL_ITERATOR_BASE_H
 #include <stl_iterator_base.h>
 #endif
+
 #ifndef __SGI_STL_INTERNAL_ITERATOR_H
 #include <stl_iterator.h>
 #endif
+
 #ifndef __TYPE_TRAITS_H
 #include <type_traits.h>
 #endif
+
 #ifndef __SGI_STL_INTERNAL_CONSTRUCT_H
 #include <stl_construct.h>
 #endif
+
 #ifndef __SGI_STL_INTERNAL_RAW_STORAGE_ITERATOR_H
 #include <stl_raw_storage_iter.h>
 #endif
@@ -67,6 +72,7 @@ using __STD::random_access_iterator_tag;
 #if 0
 using __STD::iterator;
 #endif
+
 using __STD::input_iterator;
 using __STD::output_iterator;
 using __STD::forward_iterator;

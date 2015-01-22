@@ -94,15 +94,15 @@ __median(const _Tp& __a, const _Tp& __b, const _Tp& __c, _Compare __comp) {
 
 // for_each.  Apply a function to every element of a range.
 //for_each函数中，仿函数__f不能修改相应的值，因为迭代器类型是_InputIter类型；
+//本质上就是一个for循环;
 template <class _InputIter, class _Function>
 _Function for_each(_InputIter __first, _InputIter __last, _Function __f) {
   for ( ; __first != __last; ++__first)
     __f(*__first);
-  return __f;
+  return __f;//返回值被忽略;
 }
 
 // find and find_if.
-//版本1
 template <class _InputIter, class _Tp>
 inline _InputIter find(_InputIter __first, _InputIter __last,
                        const _Tp& __val,
@@ -125,7 +125,7 @@ inline _InputIter find_if(_InputIter __first, _InputIter __last,
 
 #ifdef __STL_CLASS_PARTIAL_SPECIALIZATION
 
-//版本2
+//下面这个版本的find函数设计思路很好；
 template <class _RandomAccessIter, class _Tp>
 _RandomAccessIter find(_RandomAccessIter __first, _RandomAccessIter __last,
                        const _Tp& __val,
@@ -205,7 +205,8 @@ _RandomAccessIter find_if(_RandomAccessIter __first, _RandomAccessIter __last,
 #endif /* __STL_CLASS_PARTIAL_SPECIALIZATION */
 
 //find与find_if的接口函数；
-//版本2与版本1的区别：通过对first!=last的替代，使得循环终止的比较次数减少了接近75%左右
+//版本2与版本1的区别：通过对first!=last的替代，使得循环终止的比较次数减少了接近75%左右;
+//通过iterator_category参数进行函数重载，转调具体情形下效率最高的函数;
 template <class _InputIter, class _Tp>
 inline _InputIter find(_InputIter __first, _InputIter __last,
                        const _Tp& __val)
@@ -220,17 +221,14 @@ inline _InputIter find_if(_InputIter __first, _InputIter __last,
 }
 
 // adjacent_find.
-
 template <class _ForwardIter>
 _ForwardIter adjacent_find(_ForwardIter __first, _ForwardIter __last) {
   if (__first == __last)
     return __last;
   _ForwardIter __next = __first;
-  while(++__next != __last) {
-    if (*__first == *__next)
-      return __first;
-    __first = __next;
-  }
+  while(++__next != __last&&*__first!=*__next)
+      __first=__next;
+  if(__next!=__last)return __first;
   return __last;
 }
 
@@ -248,12 +246,8 @@ _ForwardIter adjacent_find(_ForwardIter __first, _ForwardIter __last,
   return __last;
 }
 
-// count and count_if.  There are two version of each, one whose return type
-// type is void and one (present only if we have partial specialization)
-// whose return type is iterator_traits<_InputIter>::difference_type.  The
-// C++ standard only has the latter version, but the former, which was present
-// in the HP STL, is retained for backward compatibility.
-
+// count and count_if.
+//一个是通过引用参数来记录结果；一个是直接返回结果；
 template <class _InputIter, class _Tp, class _Size>
 void count(_InputIter __first, _InputIter __last, const _Tp& __value,
            _Size& __n) {
@@ -303,31 +297,27 @@ _ForwardIter1 search(_ForwardIter1 __first1, _ForwardIter1 __last1,
 {
   // Test for empty ranges
   if (__first1 == __last1 || __first2 == __last2)
-    return __first1;//如果__first1==__last1，返回__first1或者__last1表示查找失败；如果__first2==__last2，返回__first1表示查找成功
+    return __first1;//如果__first1==__last1，返回__first1或者__last1表示查找失败；
+                    //如果__first2==__last2，返回__first1表示查找成功
 
-  // Test for a pattern of length 1.
+  // Test for a pattern of length 1;
   _ForwardIter2 __tmp(__first2);
   ++__tmp;
   if (__tmp == __last2)
     return find(__first1, __last1, *__first2);
 
-  // General case.
-
+  // General case;
   _ForwardIter2 __p1, __p;
-
-  __p1 = __first2; ++__p1;
-
+  __p1 = __first2; 
+  ++__p1;
   _ForwardIter1 __current = __first1;
 
   while (__first1 != __last1) {
     __first1 = find(__first1, __last1, *__first2);
-    if (__first1 == __last1)
-      return __last1;
-
+    if (__first1 == __last1)return __last1;
     __p = __p1;
     __current = __first1; 
-    if (++__current == __last1)
-      return __last1;
+    if (++__current == __last1)return __last1;
 
     while (*__current == *__p) {
       if (++__p == __last2)
@@ -335,10 +325,9 @@ _ForwardIter1 search(_ForwardIter1 __first1, _ForwardIter1 __last1,
       if (++__current == __last1)
         return __last1;
     }
-
     ++__first1;
   }
-  return __first1;//此时__first1==__last1，表示查找失败
+  return __last1;//此时__first1==__last1，表示查找失败
 }
 
 template <class _ForwardIter1, class _ForwardIter2, class _BinaryPred>
@@ -368,11 +357,6 @@ _ForwardIter1 search(_ForwardIter1 __first1, _ForwardIter1 __last1,
   _ForwardIter1 __current = __first1;
 
   while (__first1 != __last1) {
-    //while (__first1 != __last1) {
-    //  if (__predicate(*__first1, *__first2))
-    //    break;
-    //  ++__first1;
-    //}
     while (__first1 != __last1 && !__predicate(*__first1, *__first2))
       ++__first1;
     if (__first1 == __last1)
@@ -388,10 +372,9 @@ _ForwardIter1 search(_ForwardIter1 __first1, _ForwardIter1 __last1,
       if (++__current == __last1)
         return __last1;
     }
-
     ++__first1;
   }
-  return __first1;
+  return __last1;
 }
 
 // search_n.  Search for __count consecutive copies of __val.
@@ -401,23 +384,22 @@ _ForwardIter search_n(_ForwardIter __first, _ForwardIter __last,
                       _Integer __count, const _Tp& __val) {
   if (__count <= 0)
     return __first;
-  else {
-    __first = find(__first, __last, __val);
-    while (__first != __last) {
-      _Integer __n = __count - 1;
-      _ForwardIter __i = __first;
+  
+  __first = find(__first, __last, __val);
+  while (__first != __last) {
+    _Integer __n = __count - 1;
+    _ForwardIter __i = __first;
+    ++__i;
+    while (__i != __last && __n != 0 && *__i == __val) {
       ++__i;
-      while (__i != __last && __n != 0 && *__i == __val) {
-        ++__i;
-        --__n;
-      }
-      if (__n == 0)
-        return __first;
-      else
-        __first = find(__i, __last, __val);
+      --__n;
     }
-    return __last;
+    if (__n == 0)
+      return __first;
+    else
+      __first = find(__i, __last, __val);
   }
+  return __last;
 }
 
 template <class _ForwardIter, class _Integer, class _Tp, class _BinaryPred>
@@ -456,7 +438,6 @@ _ForwardIter search_n(_ForwardIter __first, _ForwardIter __last,
 } 
 
 // swap_ranges
-
 template <class _ForwardIter1, class _ForwardIter2>
 _ForwardIter2 swap_ranges(_ForwardIter1 __first1, _ForwardIter1 __last1,
                           _ForwardIter2 __first2) {
@@ -466,7 +447,7 @@ _ForwardIter2 swap_ranges(_ForwardIter1 __first1, _ForwardIter1 __last1,
 }
 
 // transform
-
+//两个版本：一个是一元仿函数参数;一个是二元仿函数参数;
 template <class _InputIter, class _OutputIter, class _UnaryOperation>
 _OutputIter transform(_InputIter __first, _InputIter __last,
                       _OutputIter __result, _UnaryOperation __opr) {
@@ -474,7 +455,6 @@ _OutputIter transform(_InputIter __first, _InputIter __last,
     *__result = __opr(*__first);
   return __result;
 }
-
 template <class _InputIter1, class _InputIter2, class _OutputIter,
           class _BinaryOperation>
 _OutputIter transform(_InputIter1 __first1, _InputIter1 __last1,
@@ -486,7 +466,8 @@ _OutputIter transform(_InputIter1 __first1, _InputIter1 __last1,
 }
 
 // replace, replace_if, replace_copy, replace_copy_if
-
+//_copy版本是参数中多一个_OutputIter迭代器，将结果写入;
+//_if版本是将参数中的具体条件用仿函数Predicate代替;
 template <class _ForwardIter, class _Tp>
 void replace(_ForwardIter __first, _ForwardIter __last,
              const _Tp& __old_value, const _Tp& __new_value) {
@@ -522,7 +503,6 @@ _OutputIter replace_copy_if(Iterator __first, Iterator __last,
 }
 
 // generate and generate_n
-
 template <class _ForwardIter, class _Generator>
 void generate(_ForwardIter __first, _ForwardIter __last, _Generator __gen) {
   for ( ; __first != __last; ++__first)
@@ -537,7 +517,6 @@ _OutputIter generate_n(_OutputIter __first, _Size __n, _Generator __gen) {
 }
 
 // remove, remove_if, remove_copy, remove_copy_if
-
 template <class _InputIter, class _OutputIter, class _Tp>
 _OutputIter remove_copy(_InputIter __first, _InputIter __last,
                         _OutputIter __result, const _Tp& __value) {
@@ -559,7 +538,7 @@ _OutputIter remove_copy_if(_InputIter __first, _InputIter __last,
     }
   return __result;
 }
-
+//remove和remove_if函数的设计巧妙，简洁，漂亮;
 template <class _ForwardIter, class _Tp>
 _ForwardIter remove(_ForwardIter __first, _ForwardIter __last,
                     const _Tp& __value) {
@@ -579,11 +558,10 @@ _ForwardIter remove_if(_ForwardIter __first, _ForwardIter __last,
 }
 
 // unique and unique_copy
-
 template <class _InputIter, class _OutputIter, class _Tp>
 _OutputIter __unique_copy(_InputIter __first, _InputIter __last,
                           _OutputIter __result, _Tp*) {
-  _Tp __value = *__first;
+  _Tp __value = *__first;//__result为_OutputIter，只能写，不能读，所以通过__value来比较；
   *__result = __value;
   while (++__first != __last)
     if (__value != *__first) {
@@ -592,7 +570,7 @@ _OutputIter __unique_copy(_InputIter __first, _InputIter __last,
     }
   return ++__result;
 }
-
+//下面的这个函数封装上面那个函数，以output_iterator_tag为参数；
 template <class _InputIter, class _OutputIter>
 inline _OutputIter __unique_copy(_InputIter __first, _InputIter __last,
                                  _OutputIter __result, 
@@ -600,6 +578,7 @@ inline _OutputIter __unique_copy(_InputIter __first, _InputIter __last,
   return __unique_copy(__first, __last, __result, __VALUE_TYPE(__first));
 }
 
+//以forward_iterator_tag为重载的参数；
 template <class _InputIter, class _ForwardIter>
 _ForwardIter __unique_copy(_InputIter __first, _InputIter __last,
                            _ForwardIter __result, forward_iterator_tag) {
@@ -616,7 +595,7 @@ inline _OutputIter unique_copy(_InputIter __first, _InputIter __last,
   return __unique_copy(__first, __last, __result,
                        __ITERATOR_CATEGORY(__result));
 }
-
+//带仿函数的版本;
 template <class _InputIter, class _OutputIter, class _BinaryPredicate,
           class _Tp>
 _OutputIter __unique_copy(_InputIter __first, _InputIter __last,

@@ -27,8 +27,10 @@ __STL_BEGIN_NAMESPACE
 
 template <class _CharT, class _IntT> 
 struct __char_traits_base {
+  
   typedef _CharT char_type;
   typedef _IntT int_type;
+  
 #ifdef __STL_USE_NEW_IOSTREAMS
   typedef streamoff off_type;
   typedef streampos pos_type;
@@ -110,6 +112,7 @@ template <class _CharT> struct char_traits
   : public __char_traits_base<_CharT, _CharT>
 {};
 
+//模板特化技巧
 // Specialization for char.
 
 __STL_TEMPLATE_NULL struct char_traits<char> 
@@ -133,7 +136,7 @@ __STL_TEMPLATE_NULL struct char_traits<wchar_t>
 {};
 
 // Helper classes that turn char_traits into function objects.
-
+//3个函数对象
 template <class _Traits>
 struct _Eq_traits
   : public binary_function<typename _Traits::char_type,

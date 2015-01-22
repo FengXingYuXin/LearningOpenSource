@@ -28,6 +28,7 @@
 #define __SGI_STL_BVECTOR_H
 
 #include <stl_range_errors.h>
+
 #ifdef __STL_CLASS_PARTIAL_SPECIALIZATION
 #include <vector.h>
 #else
@@ -38,9 +39,7 @@
 #include <stl_bvector.h>
 
 #ifdef __STL_USE_NAMESPACES
-
 using __STD::bit_vector;
-
 #endif /* __STL_USE_NAMESPACES */
 
 #endif /* __SGI_STL_BVECTOR_H */

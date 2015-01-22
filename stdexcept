@@ -23,60 +23,63 @@
 
 __STL_BEGIN_NAMESPACE
 
-//异常基类为项目开发中异常处理提供了基础条件，使得具体情形中的异常在继承框架中很好地得到处理
+//__Named_exceptin
 class __Named_exception : public __STL_EXCEPTION_BASE {
 public:
   __Named_exception(const string& __str) {
     strncpy(_M_name, __get_c_string(__str), _S_bufsize);
     _M_name[_S_bufsize - 1] = '\0';
   }
-  virtual const char* what() const __STL_NOTHROW { return _M_name; }
+  virtual const char* what() const __STL_NOTHROW { return _M_name; }//virtual 函数；
 
 private:
-  enum { _S_bufsize = 256 };//enum hack
+  enum { _S_bufsize = 256 };//enum hack，const static 类型的变量；
   char _M_name[_S_bufsize];
 };
-
+//logic_error,runtime_error;
+//logic_error类；
 class logic_error : public __Named_exception {
 public:
   logic_error(const string& __s) : __Named_exception(__s) {}
 };
-
+//runtime_error类；
 class runtime_error : public __Named_exception {
 public:
   runtime_error(const string& __s) : __Named_exception(__s) {}
 };
-
+//domain_error,invalid_argument,length_error,out_of_range;
+//domain_error类；
 class domain_error : public logic_error {
 public:
   domain_error(const string& __arg) : logic_error(__arg) {}
 };
-
+//invalid_argument类；
 class invalid_argument : public logic_error {
 public:
   invalid_argument(const string& __arg) : logic_error(__arg) {}
 };
-
+//length_error类；
 class length_error : public logic_error {
 public:
   length_error(const string& __arg) : logic_error(__arg) {}
 };
-
+//out_of_range类；
 class out_of_range : public logic_error {
 public:
   out_of_range(const string& __arg) : logic_error(__arg) {}
 };
-
+//range_error,overflow_error,underflow_error
+//range_error类；
 class range_error : public runtime_error {
 public:
   range_error(const string& __arg) : runtime_error(__arg) {}
 };
-
+//overflow_error类；
 class overflow_error : public runtime_error {
 public:
   overflow_error(const string& __arg) : runtime_error(__arg) {}
 };
-
+underflow_error类；
 class underflow_error : public runtime_error {
 public:
   underflow_error(const string& __arg) : runtime_error(__arg) {}

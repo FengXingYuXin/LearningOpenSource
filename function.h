@@ -34,7 +34,9 @@
 #ifndef __SGI_STL_INTERNAL_RELOPS
 #include <stl_relops.h>
 #endif
+
 #include <stddef.h>
+
 #ifndef __SGI_STL_INTERNAL_FUNCTION_H
 #include <stl_function.h>
 #endif
@@ -54,12 +56,14 @@ using __STD_RELOPS::operator>=;
 // Names from stl_function.h
 using __STD::unary_function; 
 using __STD::binary_function; 
+
 using __STD::plus; 
 using __STD::minus; 
 using __STD::multiplies; 
 using __STD::divides; 
 using __STD::identity_element; 
 using __STD::modulus; 
+
 using __STD::negate; 
 using __STD::equal_to; 
 using __STD::not_equal_to; 
@@ -67,6 +71,7 @@ using __STD::greater;
 using __STD::less; 
 using __STD::greater_equal; 
 using __STD::less_equal; 
+
 using __STD::logical_and; 
 using __STD::logical_or; 
 using __STD::logical_not; 
@@ -74,10 +79,12 @@ using __STD::unary_negate;
 using __STD::binary_negate; 
 using __STD::not1; 
 using __STD::not2; 
+
 using __STD::binder1st; 
 using __STD::binder2nd; 
 using __STD::bind1st; 
 using __STD::bind2nd; 
+
 using __STD::unary_compose; 
 using __STD::binary_compose; 
 using __STD::compose1; 
@@ -90,6 +97,7 @@ using __STD::select1st;
 using __STD::select2nd; 
 using __STD::project1st; 
 using __STD::project2nd; 
+
 using __STD::constant_void_fun; 
 using __STD::constant_unary_fun; 
 using __STD::constant_binary_fun; 
@@ -97,6 +105,7 @@ using __STD::constant0;
 using __STD::constant1; 
 using __STD::constant2; 
 using __STD::subtractive_rng; 
+
 using __STD::mem_fun_t; 
 using __STD::const_mem_fun_t; 
 using __STD::mem_fun_ref_t; 

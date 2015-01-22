@@ -1,3 +1,4 @@
+//rope类内操作的实现
 /*
  * Copyright (c) 1997
  * Silicon Graphics Computer Systems, Inc.

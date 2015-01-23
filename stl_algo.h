@@ -693,6 +693,7 @@ _OutputIter reverse_copy(_BidirectionalIter __first,
 
 // rotate and rotate_copy, and their auxiliary functions
 
+//辗转相除法求解最大公约数‘
 template <class _EuclideanRingElement>
 _EuclideanRingElement __gcd(_EuclideanRingElement __m,
                             _EuclideanRingElement __n)

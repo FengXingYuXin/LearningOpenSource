@@ -728,7 +728,7 @@ _ForwardIter __rotate(_ForwardIter __first,
 
   __first2 = __middle;
 
-  while (__first2 != __last) {
+  while (__first2 != __last) {//只有当__first==__middle且__first2==__last时，循环才会结束;
     swap (*__first++, *__first2++);
     if (__first == __middle)
       __middle = __first2;
@@ -783,7 +783,6 @@ _RandomAccessIter __rotate(_RandomAccessIter __first,
 
   if (__k == 0)
     return __last;
-
   else if (__k == __l) {
     swap_ranges(__first, __middle, __middle);
     return __result;

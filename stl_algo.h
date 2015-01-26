@@ -1186,10 +1186,10 @@ _RandomAccessIter __unguarded_partition(_RandomAccessIter __first,
                                         _Tp __pivot) 
 {
   while (true) {
-    while (*__first < __pivot)
+    while (*__first < __pivot)//unguarded;
       ++__first;
     --__last;
-    while (__pivot < *__last)
+    while (__pivot < *__last)//unguarded;
       --__last;
     if (!(__first < __last))
       return __first;
@@ -1203,10 +1203,10 @@ _RandomAccessIter __unguarded_partition(_RandomAccessIter __first,
                                         _Tp __pivot, _Compare __comp) 
 {
   while (true) {
-    while (__comp(*__first, __pivot))
+    while (__comp(*__first, __pivot))//unguarded;
       ++__first;
     --__last;
-    while (__comp(__pivot, *__last))
+    while (__comp(__pivot, *__last))//unguarded;
       --__last;
     if (!(__first < __last))
       return __first;
@@ -1218,12 +1218,11 @@ _RandomAccessIter __unguarded_partition(_RandomAccessIter __first,
 const int __stl_threshold = 16;
 
 // sort() and its auxiliary functions. 
-
 template <class _RandomAccessIter, class _Tp>
 void __unguarded_linear_insert(_RandomAccessIter __last, _Tp __val) {
   _RandomAccessIter __next = __last;
   --__next;
-  while (__val < *__next) {
+  while (__val < *__next) {//unguarded;
     *__last = *__next;
     __last = __next;
     --__next;
@@ -1236,14 +1235,14 @@ void __unguarded_linear_insert(_RandomAccessIter __last, _Tp __val,
                                _Compare __comp) {
   _RandomAccessIter __next = __last;
   --__next;  
-  while (__comp(__val, *__next)) {
+  while (__comp(__val, *__next)) {//unguarded;
     *__last = *__next;
     __last = __next;
     --__next;
   }
   *__last = __val;
 }
-
+//预见性策略;
 template <class _RandomAccessIter, class _Tp>
 inline void __linear_insert(_RandomAccessIter __first, 
                             _RandomAccessIter __last, _Tp*) {
@@ -1316,7 +1315,7 @@ template <class _RandomAccessIter>
 void __final_insertion_sort(_RandomAccessIter __first, 
                             _RandomAccessIter __last) {
   if (__last - __first > __stl_threshold) {
-    __insertion_sort(__first, __first + __stl_threshold);
+    __insertion_sort(__first, __first + __stl_threshold);//确保最小值已经被放到了左边界上;
     __unguarded_insertion_sort(__first + __stl_threshold, __last);
   }
   else
@@ -1340,14 +1339,14 @@ inline _Size __lg(_Size __n) {
   for (__k = 0; __n != 1; __n >>= 1) ++__k;
   return __k;
 }
-
+//混合排序算法;
 template <class _RandomAccessIter, class _Tp, class _Size>
 void __introsort_loop(_RandomAccessIter __first,
                       _RandomAccessIter __last, _Tp*,
                       _Size __depth_limit)
 {
-  while (__last - __first > __stl_threshold) {
-    if (__depth_limit == 0) {
+  while (__last - __first > __stl_threshold) {//最小分段阈值;
+    if (__depth_limit == 0) {//递归次数严重失衡，调用堆排序，处理快速排序最坏的情况;
       partial_sort(__first, __last, __last);
       return;
     }
@@ -1356,9 +1355,9 @@ void __introsort_loop(_RandomAccessIter __first,
       __unguarded_partition(__first, __last,
                             _Tp(__median(*__first,
                                          *(__first + (__last - __first)/2),
-                                         *(__last - 1))));
-    __introsort_loop(__cut, __last, (_Tp*) 0, __depth_limit);
-    __last = __cut;
+                                         *(__last - 1))));//unguarded版本是结合三点中值法一起使用;
+    __introsort_loop(__cut, __last, (_Tp*) 0, __depth_limit);//右半区间是通过递归调用来处理;
+    __last = __cut;//左半区间是通过循环来处理的，省掉了接近一半的函数调用的开销;
   }
 }
 
@@ -1390,7 +1389,7 @@ inline void sort(_RandomAccessIter __first, _RandomAccessIter __last) {
     __introsort_loop(__first, __last,
                      __VALUE_TYPE(__first),
                      __lg(__last - __first) * 2);
-    __final_insertion_sort(__first, __last);
+    __final_insertion_sort(__first, __last);//此时，最小值一定已经被放到左边界的位置上;
   }
 }
 
@@ -1407,7 +1406,7 @@ inline void sort(_RandomAccessIter __first, _RandomAccessIter __last,
 }
 
 // stable_sort() and its auxiliary functions.
-
+//稳定性的排序算法;
 template <class _RandomAccessIter>
 void __inplace_stable_sort(_RandomAccessIter __first,
                            _RandomAccessIter __last) {

@@ -790,13 +790,13 @@ _RandomAccessIter __rotate(_RandomAccessIter __first,
 
   _Distance __d = __gcd(__n, __k);
 
-  for (_Distance __i = 0; __i < __d; __i++) {
+  for (_Distance __i = 0; __i < __d; __i++) {//总共__d个循环圈
     _Tp __tmp = *__first;
     _RandomAccessIter __p = __first;
 
     if (__k < __l) {
       for (_Distance __j = 0; __j < __l/__d; __j++) {
-        if (__p > __first + __l) {
+        if (__p > __first + __l) {//判断当前位置上的元素需要从哪个区段来取得;另外，调整__p,使得__p落在前半段;
           *__p = *(__p - __l);
           __p -= __l;
         }
@@ -805,7 +805,6 @@ _RandomAccessIter __rotate(_RandomAccessIter __first,
         __p += __k;
       }
     }
-
     else {
       for (_Distance __j = 0; __j < __k/__d - 1; __j ++) {
         if (__p < __last - __k) {
@@ -824,7 +823,46 @@ _RandomAccessIter __rotate(_RandomAccessIter __first,
 
   return __result;
 }
+//上面那个函数的另外一种写法
+template <class _RandomAccessIter, class _Distance, class _Tp>
+_RandomAccessIter __rotate(_RandomAccessIter __first,
+                           _RandomAccessIter __middle,
+                           _RandomAccessIter __last,
+                           _Distance *, _Tp *) {
+  _Distance __n = __last   - __first;
+  _Distance __k = __middle - __first;
+  _Distance __l = __n - __k;
+  _RandomAccessIter __result = __first + (__last - __middle);
 
+  if (__k == 0)
+    return __last;
+  else if (__k == __l) {
+    swap_ranges(__first, __middle, __middle);
+    return __result;
+  }
+
+  _Distance __d = __gcd(__n, __k);
+  
+  _RandomAccessIter __ptr1,__ptr2,__initial;
+  while(__d--){
+    __initial=__first+__d;
+    T __value=*__initial;
+    __ptr1=__initial;
+    __ptr2=__initial+__k;
+    
+    while(__ptr2!=__initial){
+    	*__ptr1=*__ptr2;
+    	__ptr1=__ptr2;
+    	if(__last-__ptr2>__k)
+    	    __ptr2+=__k;
+    	else
+    	    __ptr2=__first+__k-(__last-__ptr2);
+    }
+    *__ptr1=__value;
+  }
+  return __result;
+}
+  
 //rotate接口函数
 template <class _ForwardIter>
 inline _ForwardIter rotate(_ForwardIter __first, _ForwardIter __middle,
@@ -843,6 +881,8 @@ _OutputIter rotate_copy(_ForwardIter __first, _ForwardIter __middle,
 // Return a random number in the range [0, __n).  This function encapsulates
 // whether we're using rand (part of the standard C library) or lrand48
 // (not standard, but a much better choice whenever it's available).
+//seed一般为系统时间，cpu利用率或者实时带宽等;
+//没有真正的随机数，所以__random_number产生的是伪随机数;
 
 template <class _Distance>
 inline _Distance __random_number(_Distance __n) {
@@ -872,8 +912,8 @@ void random_shuffle(_RandomAccessIter __first, _RandomAccessIter __last,
     iter_swap(__i, __first + __rand((__i - __first) + 1));
 }
 
-// random_sample and random_sample_n (extensions, not part of the standard).
-
+//random_sample and random_sample_n (extensions, not part of the standard).
+//random_sample_n随机产生[__first,__last)之间的__n个数,并且这__n个数是不重复的;
 template <class _ForwardIter, class _OutputIter, class _Distance>
 _OutputIter random_sample_n(_ForwardIter __first, _ForwardIter __last,
                             _OutputIter __out, const _Distance __n)
@@ -988,7 +1028,7 @@ random_sample(_InputIter __first, _InputIter __last,
 }
 
 // partition, stable_partition, and their auxiliary functions
-
+//《算法导论》上的版本:针对前向迭代器;
 template <class _ForwardIter, class _Predicate>
 _ForwardIter __partition(_ForwardIter __first,
 		         _ForwardIter __last,
@@ -1009,7 +1049,7 @@ _ForwardIter __partition(_ForwardIter __first,
 
   return __first;
 }
-
+//针对双向迭代器;
 template <class _BidirectionalIter, class _Predicate>
 _BidirectionalIter __partition(_BidirectionalIter __first,
                                _BidirectionalIter __last,
@@ -1023,8 +1063,6 @@ _BidirectionalIter __partition(_BidirectionalIter __first,
         ++__first;
       else
         break;
-   //while(__first!=__last&&__pred(*__first))++__first;
-   //if(__first==__last)return __first;
     --__last;
     while (true)
       if (__first == __last)
@@ -1033,11 +1071,25 @@ _BidirectionalIter __partition(_BidirectionalIter __first,
         --__last;
       else
         break;
-  //while(__first!=__last&&!__pred(*__last))--__last;
-  //if(__first==__last)return __first;
     iter_swap(__first, __last);
     ++__first;
   }
+}
+//上面那个函数版本的另外一种简洁写法;
+template <class _BidirectionalIter, class _Predicate>
+_BidirectionalIter __partition(_BidirectionalIter __first,
+                               _BidirectionalIter __last,
+			       _Predicate __pred,
+			       bidirectional_iterator_tag) {
+   while(true){
+	while(__first!=__last&&__pred(*__first))++__first;
+	if(__first==__last)return __first;
+	--__last;
+	while(__first!=__last&&!__pred(*__last))--__last;
+	if(__first==__last)return __first;
+	swap_iter(__first,__last);
+	++__first;
+   }
 }
 
 //partition的接口函数
@@ -1048,13 +1100,13 @@ inline _ForwardIter partition(_ForwardIter __first,
   return __partition(__first, __last, __pred, __ITERATOR_CATEGORY(__first));
 }
 
-
+//partition的就地稳定版本:通过转调rotate函数，方法灵活，简洁，美妙;
 template <class _ForwardIter, class _Predicate, class _Distance>
 _ForwardIter __inplace_stable_partition(_ForwardIter __first,
                                         _ForwardIter __last,
                                         _Predicate __pred, _Distance __len) {
   if (__len == 1)
-    return __pred(*__first) ? __last : __first;
+    return __pred(*__first) ? __last : __first;n
   _ForwardIter __middle = __first;
   advance(__middle, __len / 2);
   return rotate(__inplace_stable_partition(__first, __middle, __pred, 
@@ -1072,7 +1124,7 @@ _ForwardIter __stable_partition_adaptive(_ForwardIter __first,
                                          _Pointer __buffer,
                                          _Distance __buffer_size) 
 {
-  if (__len <= __buffer_size) {
+  if (__len <= __buffer_size) {//通过缓冲区来实现;
     _ForwardIter __result1 = __first;
     _Pointer __result2 = __buffer;
     for ( ; __first != __last ; ++__first)
@@ -1090,7 +1142,7 @@ _ForwardIter __stable_partition_adaptive(_ForwardIter __first,
   else {
     _ForwardIter __middle = __first;
     advance(__middle, __len / 2);
-    return rotate(__stable_partition_adaptive(
+    return rotate(__stable_partition_adaptive(//递归调用，直到可以通过缓冲区来实现为止;
                           __first, __middle, __pred,
                           __len / 2, __buffer, __buffer_size),
                     __middle,
@@ -1127,6 +1179,7 @@ inline _ForwardIter stable_partition(_ForwardIter __first,
                                   __DISTANCE_TYPE(__first));
 }
 
+//不考虑[__first,__last)区间内所有元素全为真或者全为假的情况;
 template <class _RandomAccessIter, class _Tp>
 _RandomAccessIter __unguarded_partition(_RandomAccessIter __first, 
                                         _RandomAccessIter __last, 
@@ -1144,7 +1197,6 @@ _RandomAccessIter __unguarded_partition(_RandomAccessIter __first,
     ++__first;
   }
 }    
-
 template <class _RandomAccessIter, class _Tp, class _Compare>
 _RandomAccessIter __unguarded_partition(_RandomAccessIter __first, 
                                         _RandomAccessIter __last, 

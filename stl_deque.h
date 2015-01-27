@@ -102,14 +102,14 @@ __deque_buf_size(size_t __n, size_t __size)
 
 //针对分段连续的内存结构，设置的迭代器类型,维护整体连续的假象
 #ifndef __STL_NON_TYPE_TMPL_PARAM_BUG
-template <class _Tp, class _Ref, class _Ptr, size_t __bufsiz>
+template <class _Tp, class _Ref, class _Ptr, size_t __bufsiz>//自定义情况;
 struct _Deque_iterator {
   typedef _Deque_iterator<_Tp,_Tp&,_Tp*,__bufsiz>             iterator;
   typedef _Deque_iterator<_Tp,const _Tp&,const _Tp*,__bufsiz> const_iterator;
   static size_t 
     _S_buffer_size() { return __deque_buf_size(__bufsiz, sizeof(_Tp)); }
 #else /* __STL_NON_TYPE_TMPL_PARAM_BUG */
-template <class _Tp, class _Ref, class _Ptr>
+template <class _Tp, class _Ref, class _Ptr>//默认的情况;
 struct _Deque_iterator {
   typedef _Deque_iterator<_Tp, _Tp&, _Tp*>             iterator;
   typedef _Deque_iterator<_Tp, const _Tp&, const _Tp*> const_iterator;
@@ -128,15 +128,17 @@ struct _Deque_iterator {
 
   typedef _Deque_iterator _Self;
 
-  _Tp* _M_cur;//指向缓冲区的现行元素
-  _Tp* _M_first;//指向缓冲区的头
-  _Tp* _M_last;//指向缓冲区的尾
-  _Map_pointer _M_node;//指向管控中心
-
+  _Tp* _M_cur;//指向当前缓冲区的当前元素;
+  _Tp* _M_first;//指向当前缓冲区的首地址，即头端;
+  _Tp* _M_last;//指向当前缓冲区的尾地址的下一个位置，即临界的第一个非法位置;
+  _Map_pointer _M_node;//指向中控器中当前缓冲区指针所在中的位置;
+   
+   //构造函数;
   _Deque_iterator(_Tp* __x, _Map_pointer __y) 
     : _M_cur(__x), _M_first(*__y),
       _M_last(*__y + _S_buffer_size()), _M_node(__y) {}
   _Deque_iterator() : _M_cur(0), _M_first(0), _M_last(0), _M_node(0) {}
+  //拷贝构造函数;
   _Deque_iterator(const iterator& __x)
     : _M_cur(__x._M_cur), _M_first(__x._M_first), 
       _M_last(__x._M_last), _M_node(__x._M_node) {}
@@ -315,8 +317,8 @@ protected:
   void _M_deallocate_map(_Tp** __p, size_t __n) 
     { _M_map_allocator.deallocate(__p, __n); }
 
-  _Tp** _M_map;
-  size_t _M_map_size;
+  _Tp** _M_map;//指向中控器的第一个位置;
+  size_t _M_map_size;//中控器的大小;
 };
 
 // Specialization for instanceless allocators.
@@ -358,9 +360,9 @@ class _Deque_base
 public:
   typedef _Deque_alloc_base<_Tp,_Alloc,__bufsiz,
                              _Alloc_traits<_Tp, _Alloc>::_S_instanceless>
-          _Base;
-  typedef typename _Base::allocator_type allocator_type;
-  typedef _Deque_iterator<_Tp,_Tp&,_Tp*,__bufsiz>              iterator;
+          _Base;//基类类型的别名;
+  typedef typename _Base::allocator_type allocator_type;//配置器类型;
+  typedef _Deque_iterator<_Tp,_Tp&,_Tp*,__bufsiz>              iterator;//迭代器类型;
   typedef _Deque_iterator<_Tp,const _Tp&,const _Tp*, __bufsiz> const_iterator;
 
   _Deque_base(const allocator_type& __a, size_t __num_elements)
@@ -443,7 +445,7 @@ _Deque_base<_Tp,_Alloc,__bufsiz>::~_Deque_base() {
     _M_deallocate_map(_M_map, _M_map_size);
   }
 }
-
+//根据缓冲区的大小决定需要缓冲区的个数以及相关的初始设定;
 template <class _Tp, class _Alloc, size_t __bufsiz>
 void
 _Deque_base<_Tp,_Alloc,__bufsiz>::_M_initialize_map(size_t __num_elements)
@@ -497,7 +499,7 @@ _Deque_base<_Tp,_Alloc,__bufsiz>::_M_destroy_nodes(_Tp** __nstart,
 template <class _Tp, class _Alloc = __STL_DEFAULT_ALLOCATOR(_Tp), 
           size_t __bufsiz = 0> 
 class deque : protected _Deque_base<_Tp, _Alloc, __bufsiz> {
-  typedef _Deque_base<_Tp, _Alloc, __bufsiz> _Base;
+  typedef _Deque_base<_Tp, _Alloc, __bufsiz> _Base;//基类类型;
 public:                         // Basic types
   typedef _Tp value_type;
   typedef value_type* pointer;
@@ -640,7 +642,7 @@ public:                         // Constructor, destructor.
 #endif /* __STL_MEMBER_TEMPLATES */
 
   ~deque() { destroy(_M_start, _M_finish); }
-
+//重载赋值操作符;
   deque& operator= (const deque& __x) {
     const size_type __len = size();
     if (&__x != this) {

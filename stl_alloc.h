@@ -58,6 +58,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+
 #ifndef __RESTRICT
 #  define __RESTRICT
 #endif
@@ -76,6 +77,7 @@
 	// The above is copied from malloc.h.  Including <malloc.h>
 	// would be cleaner but fails with certain levels of standard
 	// conformance.
+//为了线程安全，而定义的三个宏;
 #   define __NODE_ALLOCATOR_LOCK if (threads && __us_rsthread_malloc) \
                 { _S_node_allocator_lock._M_acquire_lock(); }
 #   define __NODE_ALLOCATOR_UNLOCK if (threads && __us_rsthread_malloc) \
@@ -92,6 +94,7 @@
 #   define __NODE_ALLOCATOR_UNLOCK
 #   define __NODE_ALLOCATOR_THREADS false
 #endif
+
 
 __STL_BEGIN_NAMESPACE
 
@@ -113,9 +116,8 @@ __STL_BEGIN_NAMESPACE
 //第一级配置器：__malloc_alloc_template
 template <int __inst>
 class __malloc_alloc_template {
-
 private:
-
+//辅助成员函数;
   static void* _S_oom_malloc(size_t);
   static void* _S_oom_realloc(void*, size_t);
 
@@ -126,33 +128,28 @@ private:
 #endif
 
 public:
-
   static void* allocate(size_t __n)
   {
     void* __result = malloc(__n);
     if (0 == __result) __result = _S_oom_malloc(__n);
     return __result;
   }
-
   static void deallocate(void* __p, size_t /* __n */)
   {
     free(__p);
   }
-
   static void* reallocate(void* __p, size_t /* old_sz */, size_t __new_sz)
   {
     void* __result = realloc(__p, __new_sz);
     if (0 == __result) __result = _S_oom_realloc(__p, __new_sz);
     return __result;
   }
-
   static void (* __set_malloc_handler(void (*__f)()))()
   {
     void (* __old)() = __malloc_alloc_oom_handler;
     __malloc_alloc_oom_handler = __f;
     return(__old);
   }
-
 };
 
 // malloc_alloc out-of-memory handling
@@ -194,14 +191,13 @@ void* __malloc_alloc_template<__inst>::_S_oom_realloc(void* __p, size_t __n)
     }
 }
 
-typedef __malloc_alloc_template<0> malloc_alloc;
+typedef __malloc_alloc_template<0> malloc_alloc;//定义类型别名;
 
 
 
 //为了使配置器的接口符合STL的标准，SGI又为配置器包装了一层接口：simple_alloc
 template<class _Tp, class _Alloc>
 class simple_alloc {
-
 public:
     static _Tp* allocate(size_t __n)//将元素个数转换成字节个数
       { return 0 == __n ? 0 : (_Tp*) _Alloc::allocate(__n * sizeof (_Tp)); }
@@ -224,10 +220,9 @@ class debug_alloc {
 
 private:
 
-  enum {_S_extra = 8};  // Size of space used to store size.  Note
-                        // that this must be large enough to preserve
-                        // alignment.
-
+  enum {_S_extra = 8};  //保证所分配的内存大小不会为0；
+                        //保证了内存对齐：把分配内存的最前面设置成n的大小，用于校验;
+                        //内存对齐的作用就是保护前面extra大小的数据不被修改;
 public:
 
   static void* allocate(size_t __n)
@@ -240,7 +235,7 @@ public:
   static void deallocate(void* __p, size_t __n)
   {
     char* __real_p = (char*)__p - (int) _S_extra;
-    assert(*(size_t*)__real_p == __n);
+    assert(*(size_t*)__real_p == __n);//防止越界;
     _Alloc::deallocate(__real_p, __n + (int) _S_extra);
   }
 
@@ -315,23 +310,26 @@ private:
     { return (((__bytes) + (size_t) _ALIGN-1) & ~((size_t) _ALIGN - 1)); }
 
 __PRIVATE:
-  union _Obj {
+  union _Obj {//union类型节省了额外的空间;
         union _Obj* _M_free_list_link;
         char _M_client_data[1];    /* The client sees this.        */
   };
 private:
+
 # ifdef __SUNPRO_CC
     static _Obj* __STL_VOLATILE _S_free_list[]; 
         // Specifying a size results in duplicate def for 4.1
 # else
     static _Obj* __STL_VOLATILE _S_free_list[_NFREELISTS]; 
 # endif
+
   static  size_t _S_freelist_index(size_t __bytes) {
         return (((__bytes) + (size_t)_ALIGN-1)/(size_t)_ALIGN - 1);
   }
 
   // Returns an object of size __n, and optionally adds to size __n free list.
   static void* _S_refill(size_t __n);
+  
   // Allocates a chunk for nobjs of size size.  nobjs may be reduced
   // if it is inconvenient to allocate the requested number.
   static char* _S_chunk_alloc(size_t __size, int& __nobjs);
@@ -363,7 +361,7 @@ public:
   {
     void* __ret = 0;
 
-    if (__n > (size_t) _MAX_BYTES) {
+    if (__n > (size_t) _MAX_BYTES) {//调用第一级配置器来处理;
       __ret = malloc_alloc::allocate(__n);
     }
     else {
@@ -373,9 +371,9 @@ public:
       // This ensures that it is released in exit or during stack
       // unwinding.
 #     ifndef _NOTHREADS
-      /*REFERENCED*/
       _Lock __lock_instance;
 #     endif
+
       _Obj* __RESTRICT __result = *__my_free_list;
       if (__result == 0)
         __ret = _S_refill(_S_round_up(__n));
@@ -391,7 +389,7 @@ public:
   /* __p may not be 0 */
   static void deallocate(void* __p, size_t __n)
   {
-    if (__n > (size_t) _MAX_BYTES)
+    if (__n > (size_t) _MAX_BYTES)//调用第一级配置器;
       malloc_alloc::deallocate(__p, __n);
     else {
       _Obj* __STL_VOLATILE*  __my_free_list
@@ -400,9 +398,9 @@ public:
 
       // acquire lock
 #       ifndef _NOTHREADS
-      /*REFERENCED*/
       _Lock __lock_instance;
 #       endif /* _NOTHREADS */
+
       __q -> _M_free_list_link = *__my_free_list;
       *__my_free_list = __q;
       // lock is released here
@@ -431,11 +429,11 @@ __default_alloc_template<__threads, __inst>::_S_chunk_alloc(size_t __size,
     size_t __total_bytes = __size * __nobjs;
     size_t __bytes_left = _S_end_free - _S_start_free;
 
-    if (__bytes_left >= __total_bytes) {
+    if (__bytes_left >= __total_bytes) {//从内存池中取得所需的空间大小;
         __result = _S_start_free;
         _S_start_free += __total_bytes;
         return(__result);
-    } else if (__bytes_left >= __size) {
+    } else if (__bytes_left >= __size) {//只要内存池中剩余内存的大小可以容纳一个元素，就从池中取得;
         __nobjs = (int)(__bytes_left/__size);
         __total_bytes = __size * __nobjs;
         __result = _S_start_free;
@@ -452,7 +450,9 @@ __default_alloc_template<__threads, __inst>::_S_chunk_alloc(size_t __size,
             ((_Obj*)_S_start_free) -> _M_free_list_link = *__my_free_list;
             *__my_free_list = (_Obj*)_S_start_free;
         }
+        //配置堆空间，用来补充内存池;
         _S_start_free = (char*)malloc(__bytes_to_get);
+        //堆空间不足，配置失败;
         if (0 == _S_start_free) {
             size_t __i;
             _Obj* __STL_VOLATILE* __my_free_list;
@@ -460,12 +460,14 @@ __default_alloc_template<__threads, __inst>::_S_chunk_alloc(size_t __size,
             // Try to make do with what we have.  That can't
             // hurt.  We do not try smaller requests, since that tends
             // to result in disaster on multi-process machines.
+            //搜索适当的区块;
             for (__i = __size;
                  __i <= (size_t) _MAX_BYTES;
                  __i += (size_t) _ALIGN) {
                 __my_free_list = _S_free_list + _S_freelist_index(__i);
                 __p = *__my_free_list;
                 if (0 != __p) {
+                    //调整free_list以释出未用的区块;
                     *__my_free_list = __p -> _M_free_list_link;
                     _S_start_free = (char*)__p;
                     _S_end_free = _S_start_free + __i;
@@ -476,13 +478,15 @@ __default_alloc_template<__threads, __inst>::_S_chunk_alloc(size_t __size,
             }
 	    _S_end_free = 0;	// In case of exception.
             _S_start_free = (char*)malloc_alloc::allocate(__bytes_to_get);
+            //调用第一级配置器，看看out_of_memory机制是否可以解决这个问题;
+            //上面的结果是：抛出异常或者内存不足的情况得到改善;
             // This should either throw an
             // exception or remedy the situation.  Thus we assume it
             // succeeded.
         }
         _S_heap_size += __bytes_to_get;
         _S_end_free = _S_start_free + __bytes_to_get;
-        return(_S_chunk_alloc(__size, __nobjs));
+        return(_S_chunk_alloc(__size, __nobjs));//递归的调用，以进行修正;
     }
 }
 
@@ -501,12 +505,14 @@ __default_alloc_template<__threads, __inst>::_S_refill(size_t __n)
     _Obj* __current_obj;
     _Obj* __next_obj;
     int __i;
-
+    
+    //如果只获得一个区块，则返回给调用者使用，free_list无新节点;
     if (1 == __nobjs) return(__chunk);
+    //否则，调整free_list。纳入新节点;
     __my_free_list = _S_free_list + _S_freelist_index(__n);
 
     /* Build free list in chunk */
-      __result = (_Obj*)__chunk;
+      __result = (_Obj*)__chunk;//这一个区块准备返回给调用者;
       *__my_free_list = __next_obj = (_Obj*)(__chunk + __n);
       for (__i = 1; ; __i++) {
         __current_obj = __next_obj;
@@ -531,7 +537,7 @@ __default_alloc_template<threads, inst>::reallocate(void* __p,
     size_t __copy_sz;
 
     if (__old_sz > (size_t) _MAX_BYTES && __new_sz > (size_t) _MAX_BYTES) {
-        return(realloc(__p, __new_sz));
+        return(realloc(__p, __new_sz));//调用第一级配置器的相应操作;
     }
     if (_S_round_up(__old_sz) == _S_round_up(__new_sz)) return(__p);
     __result = allocate(__new_sz);

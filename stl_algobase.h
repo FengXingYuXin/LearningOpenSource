@@ -35,12 +35,15 @@
 #ifndef __STL_CONFIG_H
 #include <stl_config.h>
 #endif
+
 #ifndef __SGI_STL_INTERNAL_RELOPS
 #include <stl_relops.h>
 #endif
+
 #ifndef __SGI_STL_INTERNAL_PAIR_H
 #include <stl_pair.h>
 #endif
+
 #ifndef __TYPE_TRAITS_H_
 #include <type_traits.h>
 #endif
@@ -124,6 +127,8 @@ inline const _Tp& max(const _Tp& __a, const _Tp& __b, _Compare __comp) {
 // (2) If we're using random access iterators, then write the loop as
 // a for loop with an explicit count.
 
+//对三个函数模板进行重载：通过迭代器的型别;
+//输入迭代器版本;
 template <class _InputIter, class _OutputIter, class _Distance>
 inline _OutputIter __copy(_InputIter __first, _InputIter __last,
                           _OutputIter __result,
@@ -133,7 +138,7 @@ inline _OutputIter __copy(_InputIter __first, _InputIter __last,
     *__result = *__first;
   return __result;
 }
-
+//随机存取迭代器版本;
 template <class _RandomAccessIter, class _OutputIter, class _Distance>
 inline _OutputIter
 __copy(_RandomAccessIter __first, _RandomAccessIter __last,
@@ -156,7 +161,8 @@ __copy_trivial(const _Tp* __first, const _Tp* __last, _Tp* __result) {
 }
 
 #if defined(__STL_FUNCTION_TMPL_PARTIAL_ORDER)
-
+//第一种情况：用函数偏特化技术来实现copy函数的分派;
+//两个完全泛化函数,根据迭代器的型别进行调用;
 template <class _InputIter, class _OutputIter>
 inline _OutputIter __copy_aux2(_InputIter __first, _InputIter __last,
                                _OutputIter __result, __false_type) {
@@ -164,7 +170,6 @@ inline _OutputIter __copy_aux2(_InputIter __first, _InputIter __last,
                 __ITERATOR_CATEGORY(__first),
                 __DISTANCE_TYPE(__first));
 }
-
 template <class _InputIter, class _OutputIter>
 inline _OutputIter __copy_aux2(_InputIter __first, _InputIter __last,
                                _OutputIter __result, __true_type) {
@@ -172,13 +177,13 @@ inline _OutputIter __copy_aux2(_InputIter __first, _InputIter __last,
                 __ITERATOR_CATEGORY(__first),
                 __DISTANCE_TYPE(__first));
 }
-
+//一个偏特化版本：三个参数都是_Tp*类型;
 template <class _Tp>
 inline _Tp* __copy_aux2(_Tp* __first, _Tp* __last, _Tp* __result,
                         __true_type) {
   return __copy_trivial(__first, __last, __result);
 }
-
+//另外一个偏特化版本：前两个参数是const _Tp*类型，后一个参数_Tp*类型;
 template <class _Tp>
 inline _Tp* __copy_aux2(const _Tp* __first, const _Tp* __last, _Tp* __result,
                         __true_type) {
@@ -191,29 +196,31 @@ inline _OutputIter __copy_aux(_InputIter __first, _InputIter __last,
                               _OutputIter __result, _Tp*) {
   typedef typename __type_traits<_Tp>::has_trivial_assignment_operator
           _Trivial;
-  return __copy_aux2(__first, __last, __result, _Trivial());
+  return __copy_aux2(__first, __last, __result, _Trivial());//根据是否为POD类型进行分派调用;
 }
 
 template <class _InputIter, class _OutputIter>
 inline _OutputIter copy(_InputIter __first, _InputIter __last,
                         _OutputIter __result) {
-  return __copy_aux(__first, __last, __result, __VALUE_TYPE(__first));
-}
+  return __copy_aux(__first, __last, __result, __VALUE_TYPE(__first));//增加了一层间接调用，以使得__copy_aux函数可以
+}                                                                     //在另外的地方被调用;
 
 // Hack for compilers that don't have partial ordering of function templates
 // but do have partial specialization of class templates.
 #elif defined(__STL_CLASS_PARTIAL_SPECIALIZATION)
+//第二种情况：用类的偏特化技术来实现copy的分派调用；
 
+//完全泛化版本;
 template <class _InputIter, class _OutputIter, class _BoolType>
 struct __copy_dispatch {
   static _OutputIter copy(_InputIter __first, _InputIter __last,
                           _OutputIter __result) {
     typedef typename iterator_traits<_InputIter>::iterator_category _Category;
     typedef typename iterator_traits<_InputIter>::difference_type _Distance;
-    return __copy(__first, __last, __result, _Category(), (_Distance*) 0);
+    return __copy(__first, __last, __result, _Category(), (_Distance*) 0);//根据迭代器的型别来区分调用相应的版本;
   }
 };
-
+//一个偏特化版本：两个参数都是_Tp*类型;
 template <class _Tp>
 struct __copy_dispatch<_Tp*, _Tp*, __true_type>
 {
@@ -221,7 +228,7 @@ struct __copy_dispatch<_Tp*, _Tp*, __true_type>
     return __copy_trivial(__first, __last, __result);
   }
 };
-
+//另外一个偏特化版本：第一个参数是cosnt _Tp*类型，第二个参数是_Tp*类型;
 template <class _Tp>
 struct __copy_dispatch<const _Tp*, _Tp*, __true_type>
 {
@@ -229,7 +236,7 @@ struct __copy_dispatch<const _Tp*, _Tp*, __true_type>
     return __copy_trivial(__first, __last, __result);
   }
 };
-
+//接口函数;
 template <class _InputIter, class _OutputIter>
 inline _OutputIter copy(_InputIter __first, _InputIter __last,
                         _OutputIter __result) {
@@ -253,7 +260,7 @@ inline _OutputIter copy(_InputIter __first, _InputIter __last,
                 __ITERATOR_CATEGORY(__first),
                 __DISTANCE_TYPE(__first));
 }
-
+//第三种情况：通过带参数的宏定义来实现多个版本的完全特化;
 #define __SGI_STL_DECLARE_COPY_TRIVIAL(_Tp)                                \
   inline _Tp* copy(const _Tp* __first, const _Tp* __last, _Tp* __result) { \
     return __copy_trivial(__first, __last, __result);                      \
@@ -288,10 +295,10 @@ void* memmove(void* dest,void* src,size_t count)
 {
   ASSERT(dest!=0||src!=0);
   if(dest<=src||src+count<dest){
-    while(count--)
+    while(count--)//从头开始复制;
        *dest++=*src++;
   }
-  else{
+  else{//从尾开始复制;
     dest+=count-1;
     src+=count-1;
     while(count--)
@@ -310,7 +317,7 @@ void* memcpy(void* dest,void*src,size_t count)
 }
 //--------------------------------------------------
 // copy_backward
-
+//两个函数重载;
 template <class _BidirectionalIter1, class _BidirectionalIter2, 
           class _Distance>
 inline _BidirectionalIter2 __copy_backward(_BidirectionalIter1 __first, 

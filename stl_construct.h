@@ -52,7 +52,7 @@ template <class _T1>
 inline void construct(_T1* __p) {
   new (__p) _T1();
 }
-
+//下面两个函数通过第三个参数进行重载;
 template <class _ForwardIterator>
 void
 __destroy_aux(_ForwardIterator __first, _ForwardIterator __last, __false_type)
@@ -60,7 +60,6 @@ __destroy_aux(_ForwardIterator __first, _ForwardIterator __last, __false_type)
   for ( ; __first != __last; ++__first)
     destroy(&*__first);
 }
-
 template <class _ForwardIterator> 
 inline void __destroy_aux(_ForwardIterator, _ForwardIterator, __true_type) {}
 
@@ -69,15 +68,16 @@ inline void
 __destroy(_ForwardIterator __first, _ForwardIterator __last, _Tp*)
 {
   typedef typename __type_traits<_Tp>::has_trivial_destructor _Trivial_destructor;
-  __destroy_aux(__first, __last, _Trivial_destructor());
+  __destroy_aux(__first, __last, _Trivial_destructor());//根据元素类型是否为POD类型来进行区分选择调用;
 }
-//接口函数：destroy;只有要删除一个区间时，才需要元素类型有没有trivial constructor
+//接口函数：destroy;只有要删除一个区间时，才需要判断元素类型有没有trivial constructor
 template <class _ForwardIterator>
 inline void destroy(_ForwardIterator __first, _ForwardIterator __last) {
   __destroy(__first, __last, __VALUE_TYPE(__first));
 }
 
 //trivial destructors
+//特化版本;
 inline void destroy(char*, char*) {}
 inline void destroy(wchar_t*, wchar_t*) {}
 

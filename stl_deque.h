@@ -726,8 +726,9 @@ private:                        // helper functions for assign()
 
 #endif /* __STL_MEMBER_TEMPLATES */
 
-public:                         // push_* and pop_*
-  
+public:
+
+  //push_back,push_front,pop_back,pop_front对于简单的情况在本函数体内处理，复杂情况通过辅助函数处理;
   void push_back(const value_type& __t) {
     if (_M_finish._M_cur != _M_finish._M_last - 1) {
       construct(_M_finish._M_cur, __t);
@@ -783,7 +784,7 @@ public:                         // push_* and pop_*
       _M_pop_front_aux();
   }
 
-public:                         // Insert
+public:                        
 
   iterator insert(iterator position, const value_type& __x) {
     if (position._M_cur == _M_start._M_cur) {

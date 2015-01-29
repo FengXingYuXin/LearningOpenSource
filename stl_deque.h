@@ -533,6 +533,7 @@ protected:                      // Internal typedefs
     { return __deque_buf_size(__bufsiz, sizeof(_Tp)); }
 
 protected:
+//不知道为什么还要用using声明去处理_Base里的成员，因为本来就能够访问;
 #ifdef __STL_USE_NAMESPACES
   using _Base::_M_initialize_map;
   using _Base::_M_create_nodes;
@@ -647,7 +648,7 @@ public:                         // Constructor, destructor.
     const size_type __len = size();
     if (&__x != this) {
       if (__len >= __x.size())
-        erase(copy(__x.begin(), __x.end(), _M_start), _M_finish);
+        erase(copy(__x.begin(), __x.end(), _M_start), _M_finish);//erase和copy结合使用，这种情况会经常出现;
       else {
         const_iterator __mid = __x.begin() + difference_type(__len);
         copy(__x.begin(), __mid, _M_start);
@@ -728,14 +729,14 @@ private:                        // helper functions for assign()
 
 public:
 
-  //push_back,push_front,pop_back,pop_front对于简单的情况在本函数体内处理，复杂情况通过辅助函数处理;
+  //对端的4个操作:push_back,push_front,pop_back,pop_front;
   void push_back(const value_type& __t) {
     if (_M_finish._M_cur != _M_finish._M_last - 1) {
       construct(_M_finish._M_cur, __t);
       ++_M_finish._M_cur;
     }
     else
-      _M_push_back_aux(__t);
+      _M_push_back_aux(__t);//需要修改_M_finish迭代器的相关属性;
   }
 
   void push_back() {

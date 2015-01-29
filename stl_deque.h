@@ -286,7 +286,7 @@ distance_type(const _Deque_iterator<_Tp,_Ref,_Ptr>&) {
 //  allocators.
 
 #ifdef __STL_USE_STD_ALLOCATORS
-
+//第一种方式是通过继承关系的两个类来实现的;第二种方式是通过直接设计基类来实现的;
 // Base class for ordinary allocators.
 template <class _Tp, class _Alloc, size_t __bufsiz, bool __is_static>
 class _Deque_alloc_base {

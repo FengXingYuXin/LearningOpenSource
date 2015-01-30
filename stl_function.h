@@ -33,6 +33,7 @@
 
 __STL_BEGIN_NAMESPACE
 
+//函数对象的本质是：重载了operator()操作符的类型;
 //unary_function用来呈现一元函数的参数型别和返回值型别
 //被一元仿函数继承
 template <class _Arg, class _Result>

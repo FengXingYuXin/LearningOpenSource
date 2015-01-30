@@ -154,9 +154,9 @@ protected:
 };
 
 #endif /* __STL_USE_STD_ALLOCATORS */
-
+//默认情况下，使用第二级空间配置器：_default_malloc_alloc;
 template <class _Tp, class _Alloc = __STL_DEFAULT_ALLOCATOR(_Tp) >
-class vector : protected _Vector_base<_Tp, _Alloc> 
+class vector : protected _Vector_base<_Tp, _Alloc> //保护继承，用于实现;
 {
 private:
   typedef _Vector_base<_Tp, _Alloc> _Base;
@@ -164,7 +164,7 @@ public:
   typedef _Tp value_type;
   typedef value_type* pointer;
   typedef const value_type* const_pointer;
-  typedef value_type* iterator;
+  typedef value_type* iterator;//iterator is a pointer of _Tp type;
   typedef const value_type* const_iterator;
   typedef value_type& reference;
   typedef const value_type& const_reference;
@@ -185,6 +185,7 @@ public:
 #endif /* __STL_CLASS_PARTIAL_SPECIALIZATION */
 
 protected:
+//这个地方其实没有必要使用using声明，但是写出来很容易使人明白vector类继承_Vector_base类的意图；
 #ifdef __STL_HAS_NAMESPACES
   using _Base::_M_allocate;
   using _Base::_M_deallocate;
@@ -224,7 +225,7 @@ public:
     { return size_type(_M_end_of_storage - begin()); }
   bool empty() const
     { return begin() == end(); }
-
+//重载[]运算符;
   reference operator[](size_type __n) { return *(begin() + __n); }
   const_reference operator[](size_type __n) const { return *(begin() + __n); }
 

@@ -37,7 +37,7 @@ __STL_BEGIN_NAMESPACE
 //默认情况下的容器类型为deque，因为vector内存动态增长的时间耗费太大
 //拟容器stack的几个基本操作均是通过转调内含容器的相应操作来实现
 template <class _Tp, 
-          class _Sequence __STL_DEPENDENT_DEFAULT_TMPL(deque<_Tp>) >
+          class _Sequence=__STL_DEPENDENT_DEFAULT_TMPL(deque<_Tp>) >
 class stack;
 
 template <class _Tp, class _Seq>
@@ -75,7 +75,7 @@ protected:
   _Sequence c;
 public:
   stack() : c() {}
-  explicit stack(const _Sequence& __s) : c(__s) {}
+  explicit stack(const _Sequence& __s) : c(__s) {}//单参数的构造函数用explicit关键字进行修饰，防止隐式类型转换;
 
   bool empty() const { return c.empty(); }
   size_type size() const { return c.size(); }

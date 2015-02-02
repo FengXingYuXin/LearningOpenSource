@@ -133,9 +133,10 @@ operator>=(const queue<_Tp, _Sequence>& __x, const queue<_Tp, _Sequence>& __y)
 #endif /* __STL_FUNCTION_TMPL_PARTIAL_ORDER */
 
 //通过heap算法来实现优先队列的的建立，插入与删除，很好地保证了时间复杂度
+//通过不同的comp，建立不同的满足要求的优先队列;
 template <class _Tp, 
-          class _Sequence __STL_DEPENDENT_DEFAULT_TMPL(deque<_Tp>),
-          class _Compare
+          class _Sequence=__STL_DEPENDENT_DEFAULT_TMPL(deque<_Tp>),
+          class _Compare=
           __STL_DEPENDENT_DEFAULT_TMPL(less<typename _Sequence::value_type>) >
 class priority_queue {
 public:

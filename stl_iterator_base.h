@@ -102,7 +102,7 @@ struct iterator {
 #endif /* __STL_USE_NAMESPACES */
 
 #ifdef __STL_CLASS_PARTIAL_SPECIALIZATION
-
+//iterator_traits类用来萃取迭代器_Iterator的相应型别;
 template <class _Iterator>
 struct iterator_traits {
   typedef typename _Iterator::iterator_category iterator_category;
@@ -111,7 +111,7 @@ struct iterator_traits {
   typedef typename _Iterator::pointer           pointer;
   typedef typename _Iterator::reference         reference;
 };
-
+//针对_Tp*和const _Tp*使用类模板偏特化技巧来处理;
 template <class _Tp>
 struct iterator_traits<_Tp*> {
   typedef random_access_iterator_tag iterator_category;
@@ -120,9 +120,6 @@ struct iterator_traits<_Tp*> {
   typedef _Tp*                        pointer;
   typedef _Tp&                        reference;
 };
-
-
-//traits类，用于萃取内嵌型别
 template <class _Tp>
 struct iterator_traits<const _Tp*> {
   typedef random_access_iterator_tag iterator_category;
@@ -180,7 +177,7 @@ value_type(const _Iter& __i) { return __value_type(__i); }
 
 #else /* __STL_CLASS_PARTIAL_SPECIALIZATION */
 
-//这5个函数方便的返回迭代器的类型
+//这5个函数通过函数重载来实现以方便地返回迭代器的类型;
 template <class _Tp, class _Distance> 
 inline input_iterator_tag 
 iterator_category(const input_iterator<_Tp, _Distance>&)

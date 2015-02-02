@@ -208,7 +208,7 @@ public:
 };
 
 #else /* __STL_USE_STD_ALLOCATORS */
-
+//封装空间配置器的使用，提供类型化空间配置的接口;
 template <class _Tp, class _Alloc>
 class _List_base 
 {
@@ -387,6 +387,7 @@ public:
   void insert(iterator __position,
               const_iterator __first, const_iterator __last);
 #endif /* __STL_MEMBER_TEMPLATES */
+
   void insert(iterator __pos, size_type __n, const _Tp& __x)
     { _M_fill_insert(__pos, __n, __x); }
   void _M_fill_insert(iterator __pos, size_type __n, const _Tp& __x); 

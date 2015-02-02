@@ -67,7 +67,9 @@ inline void __slist_splice_after(_Slist_node_base* __pos,
   if (__pos != __before_first && __pos != __before_last) {
     _Slist_node_base* __first = __before_first->_M_next;
     _Slist_node_base* __after = __pos->_M_next;
+    
     __before_first->_M_next = __before_last->_M_next;
+    
     __pos->_M_next = __first;
     __before_last->_M_next = __after;
   }
@@ -85,6 +87,7 @@ __slist_splice_after(_Slist_node_base* __pos, _Slist_node_base* __head)
   }
 }
 //翻转单链表，没有头结点
+//函数中没有考虑单链表为空的情况;
 inline _Slist_node_base* __slist_reverse(_Slist_node_base* __node)
 {
   _Slist_node_base* __result = __node;
@@ -443,6 +446,7 @@ public:
   // slist, before_begin() is not the same iterator as end().  It 
   // is always necessary to increment before_begin() at least once to
   // obtain end().
+  //本质就是指向头结点的指针;
   iterator before_begin() { return iterator((_Node*) &_M_head); }
   const_iterator before_begin() const
     { return const_iterator((_Node*) &_M_head); }

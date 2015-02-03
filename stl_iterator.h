@@ -40,6 +40,7 @@ protected:
   _Container* container;
 public:
   typedef _Container          container_type;
+  //迭代器的型别属性;
   typedef output_iterator_tag iterator_category;
   typedef void                value_type;
   typedef void                difference_type;
@@ -52,6 +53,7 @@ public:
     container->push_back(__value);
     return *this;
   }
+  //对于一个迭代器，*,++(),++(int)三个操作符至关重要，但在此处是被禁止的，所以通过返回自身表示其不起作用;
   back_insert_iterator<_Container>& operator*() { return *this; }
   back_insert_iterator<_Container>& operator++() { return *this; }
   back_insert_iterator<_Container>& operator++(int) { return *this; }

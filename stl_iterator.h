@@ -690,6 +690,8 @@ private:
 // time operator* is called, it calls getc.  Subsequent calls to getc 
 // return a cached character, and calls to operator++ use snextc.  Before
 // operator* or operator++ has been called, _M_is_initialized is false.
+
+//istreambuf_iterator ostreambuf_iterator类看到不少很明白;
 template<class _CharT, class _Traits>
 class istreambuf_iterator
 {

@@ -64,7 +64,7 @@ __STL_BEGIN_NAMESPACE
 #pragma set woff 1375
 #endif
 
-//鲁道夫-贝尔：RB-tree的发明者
+//鲁道夫-贝尔：RB-tree的设计者;
 typedef bool _Rb_tree_Color_type;
 const _Rb_tree_Color_type _S_rb_tree_red = false;
 const _Rb_tree_Color_type _S_rb_tree_black = true;
@@ -1340,6 +1340,7 @@ template <class _Key, class _Value, class _KeyOfValue,
           class _Compare, class _Alloc>
 bool _Rb_tree<_Key,_Value,_KeyOfValue,_Compare,_Alloc>::__rb_verify() const
 {
+  //树中没有节点的情况;
   if (_M_node_count == 0 || begin() == end())
     return _M_node_count == 0 && begin() == end() &&
       _M_header->_M_left == _M_header && _M_header->_M_right == _M_header;
@@ -1349,21 +1350,21 @@ bool _Rb_tree<_Key,_Value,_KeyOfValue,_Compare,_Alloc>::__rb_verify() const
     _Link_type __x = (_Link_type) __it._M_node;
     _Link_type __L = _S_left(__x);
     _Link_type __R = _S_right(__x);
-
+//红黑树中__x节点和它的孩子节点的颜色判断；
     if (__x->_M_color == _S_rb_tree_red)
       if ((__L && __L->_M_color == _S_rb_tree_red) ||
           (__R && __R->_M_color == _S_rb_tree_red))
         return false;
-
+//红黑树中__x节点和它的孩子节点的键值判断;
     if (__L && _M_key_compare(_S_key(__x), _S_key(__L)))
       return false;
     if (__R && _M_key_compare(_S_key(__R), _S_key(__x)))
       return false;
-
+//红黑树中黑高的判断;
     if (!__L && !__R && __black_count(__x, _M_root()) != __len)
       return false;
   }
-
+//红黑树中特殊值的判断;
   if (_M_leftmost() != _Rb_tree_node_base::_S_minimum(_M_root()))
     return false;
   if (_M_rightmost() != _Rb_tree_node_base::_S_maximum(_M_root()))

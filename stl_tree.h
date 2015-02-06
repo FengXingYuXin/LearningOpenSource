@@ -336,22 +336,22 @@ _Rb_tree_rebalance_for_erase(_Rb_tree_node_base* __z,
     
   if (__y != __z) {          // 针对情况C有两个孩子的情况，用__z的后继节点代替__z节点
   
-    __z->_M_left->_M_parent = __y; 
+    __z->_M_left->_M_parent = __y; //建立__y与__z->_M_left之间的关系;其中__y节点为__z节点的后继节点;
     __y->_M_left = __z->_M_left;
     
     if (__y != __z->_M_right) {//__z的后继节点不是__z的右孩子的情况
       __x_parent = __y->_M_parent;
       
-      if (__x) __x->_M_parent = __y->_M_parent;
+      if (__x) __x->_M_parent = __y->_M_parent;//建立__y->_M_parent节点与__x(__y->_M_right)之间的关系;
       __y->_M_parent->_M_left = __x;      // __y must be a child of _M_left
       
-      __y->_M_right = __z->_M_right;
+      __y->_M_right = __z->_M_right;//建立__z->_M_right与__y节点之间的关系;
       __z->_M_right->_M_parent = __y;
     }
     else
       __x_parent = __y;  
       
-    if (__root == __z)//__z的后继节点是__z的右孩子的情况
+    if (__root == __z)//建立__z->_M_parent与__y节点之间的关系;
       __root = __y;
     else if (__z->_M_parent->_M_left == __z)
       __z->_M_parent->_M_left = __y;
@@ -366,7 +366,7 @@ _Rb_tree_rebalance_for_erase(_Rb_tree_node_base* __z,
   else {//被删除节点__z最多只有一个孩子的情况
     __x_parent = __y->_M_parent;
     
-    if (__x) __x->_M_parent = __y->_M_parent; //将__x与__z->_M_parent连接起来  
+    if (__x) __x->_M_parent = __y->_M_parent; //建立__x(__y的非空孩子节点或者空孩子节点)与__y->_M_parent节点之间的关系;
     if (__root == __z)
       __root = __x;
     else 
